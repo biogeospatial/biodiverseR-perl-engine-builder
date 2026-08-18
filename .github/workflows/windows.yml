@@ -199,8 +199,9 @@ jobs:
           set BDV_PP_BUILDING=1
           cd BiodiverseR/inst/perl
           where pp_autolink
+          echo "$env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:HOME/BiodiverseR.exe script/BiodiverseR"
           perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:HOME/BiodiverseR.exe script/BiodiverseR
-          cd ..
+          cd $env:HOME
           dir
           
       - name: Get build version as SHA of BiodiverseR repo
