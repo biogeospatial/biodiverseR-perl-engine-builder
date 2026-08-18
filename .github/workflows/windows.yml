@@ -199,33 +199,31 @@ jobs:
           set BDV_PP_BUILDING=1
           cd BiodiverseR/inst/perl
           where pp_autolink
-          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:HOME/BiodiverseR.exe script/BiodiverseR
-          cd ..
+          echo "$env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:GITHUB_WORKSPACE/BiodiverseR.exe script/BiodiverseR"
+          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:GITHUB_WORKSPACE/BiodiverseR.exe script/BiodiverseR
+          cd $env:GITHUB_WORKSPACE
           dir
           
-      - name: Get build version
+      - name: Get build version as SHA of BiodiverseR repo
         id: build_version
         shell: bash
         run: |
-          #  should add a --version arg to the script
-          #v=`perl -E'my $f = [glob ("BiodiverseGUI_*.exe")]->[-1]; $f =~ s/^BiodiverseGUI_//; $f =~ s/\.exe$//; print $f'`
-          #echo $v
-          #  FIXME
-          v='testing'
+          cd BiodiverseR
+          v=`git rev-parse --short HEAD`
           echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
         #  need to work out which type is most appropriate
       - uses: actions/attest@v4
         with:
-          subject-path: ${{ env.HOME }}/Biodiverse*.exe
+          subject-path: ./Biodiverse*.exe
           predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
         
       - name: Upload artefact
         uses: actions/upload-artifact@v7
         with:
-          name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
+          name: BiodiverseR_win_${{ steps.build_version.outputs.BD_VERSION }}
           path: |
-            $env:HOME/Biodiverse*.exe
+            ./Biodiverse*.exe
 
 
