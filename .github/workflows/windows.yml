@@ -212,12 +212,12 @@ jobs:
           #echo $v
           #  FIXME
           v='testing'
-          "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
+          echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
         #  need to work out which type is most appropriate
       - uses: actions/attest@v4
         with:
-          subject-path: ./Biodiverse*.exe
+          subject-path: ${{ env.HOME }}/Biodiverse*.exe
           predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
         
