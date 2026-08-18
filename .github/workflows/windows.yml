@@ -202,7 +202,7 @@ jobs:
           where pp_autolink
           echo "$env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:GITHUB_WORKSPACE/BiodiverseR.exe script/BiodiverseR"
           perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:GITHUB_WORKSPACE/BiodiverseR.exe script/BiodiverseR
-          cd $env:HOME
+          cd $env:GITHUB_WORKSPACE
           dir
           
       - name: Get build version as SHA of BiodiverseR repo
@@ -216,7 +216,7 @@ jobs:
         #  need to work out which type is most appropriate
       - uses: actions/attest@v4
         with:
-          subject-path: ${{ env.GITHUB_WORKSPACE }}/Biodiverse*.exe
+          subject-path: ./Biodiverse*.exe
           predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
         
@@ -225,6 +225,6 @@ jobs:
         with:
           name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
           path: |
-            $env:GITHUB_WORKSPACE/Biodiverse*.exe
+            ./Biodiverse*.exe
 
 
