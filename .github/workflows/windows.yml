@@ -143,6 +143,7 @@ jobs:
           gmake install
           cd ..
           where pp_autolink.pl
+          # ls /Users/runner/perl5/bin
 
 
       - name: Clone biodiverse repo
@@ -164,7 +165,6 @@ jobs:
       - name: Clone BiodiverseR repo
         shell: pwsh
         run: |
-          # $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
           #git clone --branch $env:BD_BRANCH --depth=1 https://github.com/biogeospatial/BiodiverseR.git
           git clone --branch main --depth=1 https://github.com/biogeospatial/BiodiverseR.git
@@ -192,15 +192,14 @@ jobs:
           path: \Users\runner\perl5
           #include-hidden-files: true
 
-      #  cmd for this one - a little easier to run pp_autolink
       - name: Build exe
-        shell: cmd
+        shell: pwsh
         run: |
           set BD_NO_GUI_DEV_WARN=1
           set BDV_PP_BUILDING=1
           cd BiodiverseR/inst/perl
           where pp_autolink
-          pp_autolink -s script\BiodiverseR -o %HOME%\BiodiverseR.exe
+          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -o $env:HOME/BiodiverseR.exe script/BiodiverseR
           cd ..
           dir
           
