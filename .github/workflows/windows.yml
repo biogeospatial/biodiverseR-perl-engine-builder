@@ -199,8 +199,8 @@ jobs:
           set BDV_PP_BUILDING=1
           cd BiodiverseR/inst/perl
           where pp_autolink
-          echo "$env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:HOME/BiodiverseR.exe script/BiodiverseR"
-          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:HOME/BiodiverseR.exe script/BiodiverseR
+          echo "$env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:GITHUB_WORKSPACE/BiodiverseR.exe script/BiodiverseR"
+          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:GITHUB_WORKSPACE/BiodiverseR.exe script/BiodiverseR
           cd $env:HOME
           dir
           
@@ -215,7 +215,7 @@ jobs:
         #  need to work out which type is most appropriate
       - uses: actions/attest@v4
         with:
-          subject-path: ${{ env.HOME }}/Biodiverse*.exe
+          subject-path: ${{ env.GITHUB_WORKSPACE }}/Biodiverse*.exe
           predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
         
@@ -224,6 +224,6 @@ jobs:
         with:
           name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
           path: |
-            $env:HOME/Biodiverse*.exe
+            $env:GITHUB_WORKSPACE/Biodiverse*.exe
 
 
