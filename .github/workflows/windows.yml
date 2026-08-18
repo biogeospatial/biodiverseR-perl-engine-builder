@@ -203,29 +203,29 @@ jobs:
           cd ..
           dir
           
-      # - name: Get build version
-        # id: build_version
-        # shell: bash
-        # run: |
-          # #  should add a --version arg to the script
-          # #v=`perl -E'my $f = [glob ("BiodiverseGUI_*.exe")]->[-1]; $f =~ s/^BiodiverseGUI_//; $f =~ s/\.exe$//; print $f'`
-          # #echo $v
-          # #  FIXME
-          # v='testing'
-          # echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
+      - name: Get build version
+        id: build_version
+        shell: bash
+        run: |
+          #  should add a --version arg to the script
+          #v=`perl -E'my $f = [glob ("BiodiverseGUI_*.exe")]->[-1]; $f =~ s/^BiodiverseGUI_//; $f =~ s/\.exe$//; print $f'`
+          #echo $v
+          #  FIXME
+          v='testing'
+          "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
-        # #  need to work out which type is most appropriate
-      # - uses: actions/attest@v4
-        # with:
-          # subject-path: ./Biodiverse*.exe
-          # predicate-type: 'https://slsa.dev/provenance/v0.2'
-          # predicate: '{}'
+        #  need to work out which type is most appropriate
+      - uses: actions/attest@v4
+        with:
+          subject-path: ./Biodiverse*.exe
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
         
-      # - name: Upload artefact
-        # uses: actions/upload-artifact@v7
-        # with:
-          # name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
-          # path: |
-            # ./Biodiverse*.exe
+      - name: Upload artefact
+        uses: actions/upload-artifact@v7
+        with:
+          name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
+          path: |
+            $env:HOME/Biodiverse*.exe
 
 
