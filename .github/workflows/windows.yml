@@ -192,19 +192,17 @@ jobs:
           path: \Users\runner\perl5
           #include-hidden-files: true
 
-          
-      # - name: Build exe
-        # shell: pwsh
-        # run: |
-          # $env:PATH = "$env:SP_PATHS;$env:PATH"
-          # $env:BD_NO_GUI_DEV_WARN=1
-          # $env:BDV_PP_BUILDING=1
-          # $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
-          # cd BiodiverseR/inst/perl
-          # $env:PERL5LIB = "$env:PERL5LIB;$env:GITHUB_WORKSPACE/biodiverse/lib"
-          # perl etc\pp\build_autolink.pl -s script/BiodiverseR -o ../..
-          # cd ..
-          # dir
+      #  cmd for this one - a little easier to run pp_autolink
+      - name: Build exe
+        shell: cmd
+        run: |
+          set BD_NO_GUI_DEV_WARN=1
+          set BDV_PP_BUILDING=1
+          cd BiodiverseR/inst/perl
+          where pp_autolink
+          pp_autolink -s script\BiodiverseR -o %HOME%\BiodiverseR.exe
+          cd ..
+          dir
           
       # - name: Get build version
         # id: build_version
