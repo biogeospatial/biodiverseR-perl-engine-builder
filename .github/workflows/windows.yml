@@ -17,7 +17,7 @@ env:
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_CPANM_HOME: /Users/runner/_cpanm
-  BD_BRANCH: r5.99_002
+  BD_BRANCH: master
   SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
   SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
@@ -79,6 +79,7 @@ jobs:
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
             
 
+      #  many of these are already part of the downloaded perl
       - name: Install cpan deps 
         shell: pwsh
         run: |
@@ -91,17 +92,17 @@ jobs:
           perl -E'say $^V'
           cpanm --notest PAR::Packer
           #cpanm App::PP::Autolink
-          cpanm --notest Alien::MSYS
-          cpanm --notest Alien::libtiff
-          cpanm --notest Alien::sqlite
-          cpanm --notest --installdeps Alien::geos::af
-          cpanm --notest -v Alien::geos::af
-          cpanm --notest --installdeps Alien::proj
-          cpanm --notest -v Alien::proj
-          cpanm --notest --installdeps Alien::gdal
-          $env:ALIEN_GDAL_CMAKE_ARGS = "-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
-          $env:ALIEN_INSTALL_TYPE = "share"
-          cpanm --notest -v Alien::gdal
+          # cpanm --notest Alien::MSYS
+          # cpanm --notest Alien::libtiff
+          # cpanm --notest Alien::sqlite
+          # cpanm --notest --installdeps Alien::geos::af
+          # cpanm --notest -v Alien::geos::af
+          # cpanm --notest --installdeps Alien::proj
+          # cpanm --notest -v Alien::proj
+          # cpanm --notest --installdeps Alien::gdal
+          # $env:ALIEN_GDAL_CMAKE_ARGS = "-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          # $env:ALIEN_INSTALL_TYPE = "share"
+          # cpanm --notest -v Alien::gdal
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
@@ -156,8 +157,8 @@ jobs:
           # set PATH=%SP_PATHS%;%PATH%
           $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
-          #git clone --branch $env:BD_BRANCH --depth=1 https://github.com/shawnlaffan/biodiverse.git
-          git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          git clone --branch $env:BD_BRANCH --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
           #prove t/00-load.t
