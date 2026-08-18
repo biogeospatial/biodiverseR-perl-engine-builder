@@ -21,6 +21,7 @@ env:
   SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
   SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
 
 jobs:
   perl:
@@ -40,14 +41,15 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/biogeospatial/biodiverse-sp-portable/releases/download/5.42.2.1-20260513/bd-sp-perl-5.38.4.1-64bit-PDL-20260513.zip" -OutFile ".\sp.zip" 
           Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
           ls "$env:ST"
-          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> $GITHUB_PATH
+          "PATH=$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin;$env:PATH" >> $env:GITHUB_ENV
 
       - name: perl -V
         shell: cmd
         run: |
-          set PATH=%SP_PATHS%;%PATH%
+          :: set PATH=%SP_PATHS%;%PATH%
           path
           perl -V
+          pwd
 
         #  These dirs must exist before caching 
         #  is first called or it will not work.
@@ -63,11 +65,10 @@ jobs:
       - name: Prepare for cache
         shell: cmd
         run: |
-          set PATH=%SP_PATHS%;%PATH%
           path
           perl -V > perlversion.txt
           ::  change the checksum so we refresh the cache
-          echo '20251028' >> perlversion.txt
+          echo '20260818' >> perlversion.txt
           
       - name: Cache CPAN modules
         uses: actions/cache@v5
@@ -83,10 +84,6 @@ jobs:
       - name: Install cpan deps 
         shell: pwsh
         run: |
-          $env:CMAKE_BUILD_PARALLEL_LEVEL=4
-          # set PATH=%SP_PATHS%;%PATH%
-          # path
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           echo $env:PATH
           # set PERL_CPANM_HOME=/Users/runner/.cpanm
           perl -E'say $^V'
@@ -106,12 +103,12 @@ jobs:
           cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
-          cpanm --notest Browser::Start
+          # cpanm --notest Browser::Start
           cpanm --notest ExtUtils::Depends
           cpanm --notest HTTP::Tiny
           cpanm --notest IO::Socket::SSL
           cpanm --notest LWP::Simple
-          cpanm --notest Geo::ShapeFile
+          # cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
           cpanm --notest Spreadsheet::Read
           cpanm --installdeps --notest Geo::GDAL::FFI
@@ -120,7 +117,6 @@ jobs:
       - name: PAR::Packer with Biodiverse icon
         shell: pwsh
         run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           $env:PAR_PACKER = "PAR-Packer-1.064"
           $env:PP_GZ = "$env:PAR_PACKER.tar.gz"
           $env:URL = "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/$env:PP_GZ"
@@ -139,8 +135,6 @@ jobs:
       - name: pp-autolink
         shell: pwsh
         run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
-          #cpanm App::PP::Autolink~2.13
           perl -E'say $^V'
           git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
           cd perl-pp-autolink
@@ -154,8 +148,6 @@ jobs:
       - name: Clone biodiverse repo
         shell: pwsh
         run: |
-          # set PATH=%SP_PATHS%;%PATH%
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
           git clone --branch $env:BD_BRANCH --depth=1 https://github.com/shawnlaffan/biodiverse.git
           #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
@@ -165,18 +157,21 @@ jobs:
           #  run all tests
           prove -j4 -l t
           cd ..
+          #  add to env
+          "PERL5LIB=$env:PERL5LIB;$env:GITHUB_WORKSPACE/biodiverse/lib" >> $env:GITHUB_ENV
           
 
       - name: Clone BiodiverseR repo
         shell: pwsh
         run: |
-          # set PATH=%SP_PATHS%;%PATH%
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          # $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
           #git clone --branch $env:BD_BRANCH --depth=1 https://github.com/biogeospatial/BiodiverseR.git
           git clone --branch main --depth=1 https://github.com/biogeospatial/BiodiverseR.git
           cd BiodiverseR/inst/perl
           cpanm --installdeps .
+          $env:PERL5LIB = "$env:PERL5LIB;$env:GITHUB_WORKSPACE/biodiverse/lib"
+          echo $env:PERL5LIB
           prove -j4 -l t
           cd ..
 
@@ -198,41 +193,42 @@ jobs:
           #include-hidden-files: true
 
           
-      - name: Build exe
-        shell: pwsh
-        run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
-          $env:BD_NO_GUI_DEV_WARN=1
-          $env:BDV_PP_BUILDING=1
-          $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
-          cd BiodiverseR/inst/perl
-          perl etc\pp\build_autolink.pl -s script/BiodiverseR -o ../..
-          cd ..
-          dir
+      # - name: Build exe
+        # shell: pwsh
+        # run: |
+          # $env:PATH = "$env:SP_PATHS;$env:PATH"
+          # $env:BD_NO_GUI_DEV_WARN=1
+          # $env:BDV_PP_BUILDING=1
+          # $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
+          # cd BiodiverseR/inst/perl
+          # $env:PERL5LIB = "$env:PERL5LIB;$env:GITHUB_WORKSPACE/biodiverse/lib"
+          # perl etc\pp\build_autolink.pl -s script/BiodiverseR -o ../..
+          # cd ..
+          # dir
           
-      - name: Get build version
-        id: build_version
-        shell: bash
-        run: |
-          #  should add a --version arg to the script
-          #v=`perl -E'my $f = [glob ("BiodiverseGUI_*.exe")]->[-1]; $f =~ s/^BiodiverseGUI_//; $f =~ s/\.exe$//; print $f'`
-          #echo $v
-          #  FIXME
-          v='testing'
-          echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
+      # - name: Get build version
+        # id: build_version
+        # shell: bash
+        # run: |
+          # #  should add a --version arg to the script
+          # #v=`perl -E'my $f = [glob ("BiodiverseGUI_*.exe")]->[-1]; $f =~ s/^BiodiverseGUI_//; $f =~ s/\.exe$//; print $f'`
+          # #echo $v
+          # #  FIXME
+          # v='testing'
+          # echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
-        #  need to work out which type is most appropriate
-      - uses: actions/attest@v4
-        with:
-          subject-path: ./Biodiverse*.exe
-          predicate-type: 'https://slsa.dev/provenance/v0.2'
-          predicate: '{}'
+        # #  need to work out which type is most appropriate
+      # - uses: actions/attest@v4
+        # with:
+          # subject-path: ./Biodiverse*.exe
+          # predicate-type: 'https://slsa.dev/provenance/v0.2'
+          # predicate: '{}'
         
-      - name: Upload artefact
-        uses: actions/upload-artifact@v7
-        with:
-          name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
-          path: |
-            ./Biodiverse*.exe
+      # - name: Upload artefact
+        # uses: actions/upload-artifact@v7
+        # with:
+          # name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
+          # path: |
+            # ./Biodiverse*.exe
 
 
