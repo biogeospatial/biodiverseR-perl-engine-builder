@@ -199,7 +199,7 @@ jobs:
           set BDV_PP_BUILDING=1
           cd BiodiverseR/inst/perl
           where pp_autolink
-          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -o $env:HOME/BiodiverseR.exe script/BiodiverseR
+          perl $env:PERL_LOCAL_LIB_ROOT/bin/pp_autolink.pl -x -o $env:HOME/BiodiverseR.exe script/BiodiverseR
           cd ..
           dir
           
