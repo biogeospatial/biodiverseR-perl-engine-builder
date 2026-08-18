@@ -1,0 +1,237 @@
+name: windows
+
+on:
+  push:
+    #paths:
+    #  - "build_trigger.txt"
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL5LIB: /Users/runner/perl5/lib/perl5
+  PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
+  PERL_MB_OPT: --install_base /Users/runner/perl5
+  PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
+  PERL_CPANM_OPT: -M https://www.cpan.org
+  PERL_CPANM_HOME: /Users/runner/_cpanm
+  BD_BRANCH: r5.99_002
+  SP_VERSION: 5.38.4.1
+  ST: C:\Strawberry538
+  SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
+
+jobs:
+  perl:
+
+    runs-on: windows-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Strawberry perl
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/biogeospatial/biodiverse-sp-portable/releases/download/5.42.2.1-20260513/bd-sp-perl-5.38.4.1-64bit-PDL-20260513.zip" -OutFile ".\sp.zip" 
+          Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
+          ls "$env:ST"
+          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> $GITHUB_PATH
+
+      - name: perl -V
+        shell: cmd
+        run: |
+          set PATH=%SP_PATHS%;%PATH%
+          path
+          perl -V
+
+        #  These dirs must exist before caching 
+        #  is first called or it will not work.
+        #  The upload action also does not like dirs with leading dots.
+      - name: Make the cache dir
+        shell: pwsh
+        run: |
+          New-Item -Path "$env:PERL_LOCAL_LIB_ROOT" -ItemType Directory
+          ls /Users/runner/perl5
+          New-Item -Path "$env:PERL_CPANM_HOME" -ItemType Directory
+          ls /Users/runner/_cpanm
+
+      - name: Prepare for cache
+        shell: cmd
+        run: |
+          set PATH=%SP_PATHS%;%PATH%
+          path
+          perl -V > perlversion.txt
+          ::  change the checksum so we refresh the cache
+          echo '20251028' >> perlversion.txt
+          
+      - name: Cache CPAN modules
+        uses: actions/cache@v5
+        if: "!cancelled()"
+        with:
+          path: \Users\runner\perl5
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+            
+
+      - name: Install cpan deps 
+        shell: pwsh
+        run: |
+          $env:CMAKE_BUILD_PARALLEL_LEVEL=4
+          # set PATH=%SP_PATHS%;%PATH%
+          # path
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          echo $env:PATH
+          # set PERL_CPANM_HOME=/Users/runner/.cpanm
+          perl -E'say $^V'
+          cpanm --notest PAR::Packer
+          #cpanm App::PP::Autolink
+          cpanm --notest Alien::MSYS
+          cpanm --notest Alien::libtiff
+          cpanm --notest Alien::sqlite
+          cpanm --notest --installdeps Alien::geos::af
+          cpanm --notest -v Alien::geos::af
+          cpanm --notest --installdeps Alien::proj
+          cpanm --notest -v Alien::proj
+          cpanm --notest --installdeps Alien::gdal
+          $env:ALIEN_GDAL_CMAKE_ARGS = "-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+          $env:ALIEN_INSTALL_TYPE = "share"
+          cpanm --notest -v Alien::gdal
+          cpanm https://github.com/shawnlaffan/biodiverse-utils/releases/download/v1.09/Biodiverse-Utils-1.09.tar.gz
+          cpanm --notest File::BaseDir
+          cpanm --notest File::Find::Rule
+          cpanm --notest Browser::Start
+          cpanm --notest ExtUtils::Depends
+          cpanm --notest HTTP::Tiny
+          cpanm --notest IO::Socket::SSL
+          cpanm --notest LWP::Simple
+          cpanm --notest Geo::ShapeFile
+          cpanm --notest autovivification
+          cpanm --notest Spreadsheet::Read
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm Geo::GDAL::FFI
+
+      - name: PAR::Packer with Biodiverse icon
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          $env:PAR_PACKER = "PAR-Packer-1.064"
+          $env:PP_GZ = "$env:PAR_PACKER.tar.gz"
+          $env:URL = "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/$env:PP_GZ"
+          echo $env:PATH
+          perl -E'say $^V'
+          Invoke-WebRequest -Uri $env:URL -OutFile $env:PP_GZ
+          tar -xzf $env:PP_GZ
+          cd $env:PAR_PACKER
+          Copy-Item -Path "..\Biodiverse_icon.ico" -Destination .\myldr\winres\pp.ico
+          cpanm --installdeps .
+          perl Makefile.PL
+          gmake install
+          cd ..
+
+
+      - name: pp-autolink
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          #cpanm App::PP::Autolink~2.13
+          perl -E'say $^V'
+          git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
+          cd perl-pp-autolink
+          perl Makefile.PL
+          gmake test 
+          gmake install
+          cd ..
+          where pp_autolink.pl
+
+
+      - name: Clone biodiverse repo
+        shell: pwsh
+        run: |
+          # set PATH=%SP_PATHS%;%PATH%
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          perl -E'say $^V'
+          #git clone --branch $env:BD_BRANCH --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps .
+          #prove t/00-load.t
+          #  run all tests
+          prove -j4 -l t
+          cd ..
+          
+
+      - name: Clone BiodiverseR repo
+        shell: pwsh
+        run: |
+          # set PATH=%SP_PATHS%;%PATH%
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          perl -E'say $^V'
+          #git clone --branch $env:BD_BRANCH --depth=1 https://github.com/biogeospatial/BiodiverseR.git
+          git clone --branch main --depth=1 https://github.com/biogeospatial/BiodiverseR.git
+          cd BiodiverseR/inst/perl
+          cpanm --installdeps .
+          prove -j4 -l t
+          cd ..
+
+      
+      - name: Upload cpanm dir
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cpanm_dir
+          path: ${{ env.PERL_CPANM_HOME }}
+          include-hidden-files: true
+
+      - name: Upload perl5 dir
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: perl5_dir_win
+          path: \Users\runner\perl5
+          #include-hidden-files: true
+
+          
+      - name: Build exe
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:SP_PATHS;$env:PATH"
+          $env:BD_NO_GUI_DEV_WARN=1
+          $env:BDV_PP_BUILDING=1
+          $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
+          cd BiodiverseR/inst/perl
+          perl etc\pp\build_autolink.pl -s script/BiodiverseR -o ../..
+          cd ..
+          dir
+          
+      - name: Get build version
+        id: build_version
+        shell: bash
+        run: |
+          #  should add a --version arg to the script
+          #v=`perl -E'my $f = [glob ("BiodiverseGUI_*.exe")]->[-1]; $f =~ s/^BiodiverseGUI_//; $f =~ s/\.exe$//; print $f'`
+          #echo $v
+          #  FIXME
+          v='testing'
+          echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
+
+        #  need to work out which type is most appropriate
+      - uses: actions/attest@v4
+        with:
+          subject-path: ./Biodiverse*.exe
+          predicate-type: 'https://slsa.dev/provenance/v0.2'
+          predicate: '{}'
+        
+      - name: Upload artefact
+        uses: actions/upload-artifact@v7
+        with:
+          name: biodiverse_${{ steps.build_version.outputs.BD_VERSION }}_win
+          path: |
+            ./Biodiverse*.exe
+
+
