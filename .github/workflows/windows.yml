@@ -22,6 +22,7 @@ env:
   ST: C:\Strawberry538
   SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
   CMAKE_BUILD_PARALLEL_LEVEL: 4
+  BD_NO_ALIEN_GTKSTACK: 1
 
 jobs:
   perl:
