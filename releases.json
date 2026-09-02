@@ -1,0 +1,9 @@
+{
+  "current": "v0.1.0-alpha",
+  "releases": {
+    "v0.1.0-alpha": {
+      "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_win_aaf20ba.zip",
+      "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
+    }
+  }
+}
