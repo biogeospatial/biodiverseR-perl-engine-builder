@@ -94,10 +94,10 @@ If the downloaded package does not match the published checksum, BiodiverseR wil
 
 When BiodiverseR requires a runtime, it performs the following steps:
 
-1. Read the release manifest.
-2. Determine the version specified by the `current` field.
-3. Check whether that version is already installed locally.
-4. If the runtime is not installed, download the associated release package.
+1. Check whether the required runtime version is already installed locally.
+2. If the runtime is already installed, reuse the cached runtime.
+3. If the runtime is not installed, determine the version specified by the release manifest.
+4. Download the associated release package.
 5. Verify the package checksum.
 6. Extract the runtime into a version-specific cache directory.
 7. Reuse the cached runtime in future sessions.
