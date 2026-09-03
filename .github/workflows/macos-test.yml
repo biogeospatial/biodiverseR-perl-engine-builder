@@ -1,0 +1,36 @@
+name: macOS Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  perl:
+
+    runs-on: macos-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Install perlbrew
+        run: |
+          curl -L https://install.perlbrew.pl | bash
+
+      - name: Build Perl 5.38.4
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+
+          perlbrew install perl-5.38.4
+
+          perlbrew use perl-5.38.4
+
+          perl -V
+
+      - name: Install cpanminus
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          perl -MCPAN -e 'install App::cpanminus'
+
+          cpanm --version
