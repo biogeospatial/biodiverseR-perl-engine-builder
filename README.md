@@ -96,10 +96,11 @@ When BiodiverseR requires a runtime, it performs the following steps:
 
 1. Read the release manifest.
 2. Determine the version specified by the `current` field.
-3. Download the associated release package.
-4. Verify the package checksum.
-5. Extract the runtime into a version-specific cache directory.
-6. Reuse the cached runtime in future sessions.
+3. Check whether that version is already installed locally.
+4. If the runtime is not installed, download the associated release package.
+5. Verify the package checksum.
+6. Extract the runtime into a version-specific cache directory.
+7. Reuse the cached runtime in future sessions.
 
 To avoid race conditions, BiodiverseR uses an installation lock so that only one R session installs a particular runtime version at a time.
 
