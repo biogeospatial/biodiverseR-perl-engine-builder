@@ -20,6 +20,10 @@ To simplify installation, pre-built runtime packages are distributed through thi
 
 This removes the need for end users to install Perl or build Biodiverse from source.
 
+## Runtime Behaviour
+
+The runtime supports multiple concurrent server instances. BiodiverseR typically starts the server on an automatically selected available port, allowing multiple R sessions to run independently on the same machine.
+
 ## Release Manifest
 
 The repository root contains a JSON manifest describing available runtime releases.
