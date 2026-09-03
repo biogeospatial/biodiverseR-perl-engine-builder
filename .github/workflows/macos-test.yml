@@ -35,3 +35,24 @@ jobs:
           perl -MCPAN -e 'install App::cpanminus'
 
           cpanm --version
+
+      - name: Clone Biodiverse
+        run: |
+          git clone --branch master --depth=1 \
+            https://github.com/shawnlaffan/biodiverse.git
+
+      - name: Install Biodiverse dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd biodiverse
+          cpanm --installdeps --notest .
+
+      - name: Run Biodiverse tests
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd biodiverse
+          prove -j4 -l t
