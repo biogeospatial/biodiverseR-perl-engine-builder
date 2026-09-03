@@ -49,8 +49,8 @@ jobs:
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
-          cpanm --notest PDL
-          cpanm --notest PDL::
+         cpanm --notest PDL
+         cpanm --notest PDL::GSL::CDF
 
       - name: Clone Biodiverse
         run: |
