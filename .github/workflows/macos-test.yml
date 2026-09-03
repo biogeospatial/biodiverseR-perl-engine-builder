@@ -13,6 +13,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Cache perlbrew
+        uses: actions/cache@v4
+        with:
+          path: ~/perl5/perlbrew
+          key: perlbrew-5.38.4-${{ runner.os }}
+
       - name: Install perlbrew
         run: |
           curl -L https://install.perlbrew.pl | bash
@@ -21,7 +27,9 @@ jobs:
         run: |
           source ~/perl5/perlbrew/etc/bashrc
 
-          perlbrew install perl-5.38.4
+          if ! perlbrew list | grep -q "perl-5.38.4"; then
+            perlbrew install perl-5.38.4
+          fi
 
           perlbrew use perl-5.38.4
 
