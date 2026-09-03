@@ -13,6 +13,11 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          brew update
+          brew install gsl
+
       - name: Cache perlbrew
         uses: actions/cache@v4
         with:
@@ -50,7 +55,7 @@ jobs:
           perlbrew use perl-5.38.4
 
           cpanm --notest PDL
-          cpanm --notest PDL::GSL::CDF
+          cpanm -v --notest PDL::GSL::CDF
 
       - name: Clone Biodiverse
         run: |
