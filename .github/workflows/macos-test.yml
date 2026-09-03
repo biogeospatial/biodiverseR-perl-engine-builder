@@ -17,6 +17,13 @@ jobs:
         run: |
           brew update
           brew install gsl
+          brew install sqlite
+          brew install gdal
+
+      - name: Check GDAL
+        run: |
+          gdalinfo --version
+          sqlite3
 
       - name: Cache perlbrew
         uses: actions/cache@v4
@@ -61,6 +68,14 @@ jobs:
         run: |
           git clone --branch master --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
+
+      - name: Install Geo::GDAL::FFI
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm Geo::GDAL::FFI
 
       - name: Install Biodiverse dependencies
         run: |
