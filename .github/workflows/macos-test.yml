@@ -44,6 +44,14 @@ jobs:
 
           cpanm --version
 
+      - name: Install PDL dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cpanm --notest PDL
+          cpanm --notest PDL::
+
       - name: Clone Biodiverse
         run: |
           git clone --branch master --depth=1 \
