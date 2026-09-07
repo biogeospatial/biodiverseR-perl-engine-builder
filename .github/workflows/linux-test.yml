@@ -7,7 +7,7 @@ on:
 jobs:
   perl:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
 
@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/perl5/perlbrew
-          key: perlbrew-5.38.4-ubuntu22-${{ runner.arch }}
+          key: perlbrew-5.38.4-${{ runner.os }}-${{ runner.arch }}
 
       - name: Install perlbrew
         run: |
@@ -71,14 +71,6 @@ jobs:
           git clone --branch master --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
 
-      - name: Check GDAL environment
-        run: |
-          gdalinfo --version
-          gdal-config --version
-          which gdal-config
-          sqlite3 --version
-          pkg-config --modversion gdal
-
       - name: Install Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
@@ -95,28 +87,13 @@ jobs:
           cd biodiverse
           cpanm --installdeps --notest .
 
-      - name: Check Geo::GDAL::FFI symbols
-        run: |
-          source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
-
-          perl -MGeo::GDAL::FFI -e '
-            print "OGR_G_ConcaveHull exists: ";
-            print defined(&Geo::GDAL::FFI::OGR_G_ConcaveHull) ? "YES\n" : "NO\n";
-          '
-
-      - name: Check GDB drivers
-        run: |
-          ogrinfo --formats | grep -i gdb || true
-
-      - name: Run failing Biodiverse test
+      - name: Run Biodiverse tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
           cd biodiverse
-
-          prove -lv t/22-SpatialConditions-sp-points-in-polys.t
+          prove -j4 -l t
 
       - name: Clone BiodiverseR
         run: |
@@ -126,8 +103,4 @@ jobs:
 
       - name: Install BiodiverseR dependencies
         run: |
-          source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
-
-          cd BiodiverseR_src/inst/perl
-          cpanm --installdeps
+       
