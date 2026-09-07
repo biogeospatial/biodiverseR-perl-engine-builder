@@ -117,3 +117,26 @@ jobs:
 
           cd BiodiverseR/inst/perl
           prove -j4 -l t
+
+      - name: Clone BiodiverseR
+        run: |
+          git clone --branch main --depth=1 \
+            https://github.com/biogeospatial/BiodiverseR.git
+
+      - name: Install BiodiverseR dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd BiodiverseR/inst/perl
+          cpanm --installdeps --notest .
+
+      - name: Run BiodiverseR tests
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib"
+
+          cd BiodiverseR/inst/perl
+          prove -j4 -l t
