@@ -29,8 +29,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/perl5/perlbrew
-          key: perlbrew-5.38.4-${{ runner.os }}
-
+          key: perlbrew-5.38.4-${{ runner.os }}-${{ runner.arch }}
       - name: Install perlbrew
         run: |
           curl -L https://install.perlbrew.pl | bash
