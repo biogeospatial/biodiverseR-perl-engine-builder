@@ -71,13 +71,20 @@ jobs:
           git clone --branch master --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
 
+      - name: Check GDAL environment
+        run: |
+          gdalinfo --version
+          gdal-config --version
+          which gdal-config
+          sqlite3 --version
+
       - name: Install Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
-          cpanm --installdeps --notest Geo::GDAL::FFI
-          cpanm Geo::GDAL::FFI
+          cpanm -v --installdeps --notest Geo::GDAL::FFI
+          cpanm -v Geo::GDAL::FFI
 
       - name: Install Biodiverse dependencies
         run: |
