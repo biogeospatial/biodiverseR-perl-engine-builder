@@ -115,3 +115,27 @@ jobs:
 
           cd BiodiverseR/inst/perl
           prove -j4 -l t
+
+      - name: Install PAR::Packer
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cpanm --notest PAR::Packer
+
+      - name: Build BiodiverseR executable
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd BiodiverseR/inst/perl
+
+          pp -o BiodiverseR script/BiodiverseR
+
+          ls -lah BiodiverseR
+
+      - name: Upload runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BiodiverseR_macos_arm64
+          path: BiodiverseR/inst/perl/BiodiverseR
