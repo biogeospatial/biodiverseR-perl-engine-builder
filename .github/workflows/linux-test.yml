@@ -95,6 +95,16 @@ jobs:
           cd biodiverse
           cpanm --installdeps --notest .
 
+      - name: Check Geo::GDAL::FFI symbols
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          perl -MGeo::GDAL::FFI -e '
+            print "OGR_G_ConcaveHull exists: ";
+            print defined(&Geo::GDAL::FFI::OGR_G_ConcaveHull) ? "YES\n" : "NO\n";
+          '
+
       - name: Run Biodiverse tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
