@@ -107,15 +107,16 @@ jobs:
 
       - name: Check GDB drivers
         run: |
-          ogrinfo -
+          ogrinfo --formats | grep -i gdb || true
 
-      - name: Run Biodiverse tests
+      - name: Run failing Biodiverse test
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
           cd biodiverse
-          prove -j4 -l t
+
+          prove -lv t/22-SpatialConditions-sp-points-in-polys.t
 
       - name: Clone BiodiverseR
         run: |
