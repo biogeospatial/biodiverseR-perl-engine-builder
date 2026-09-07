@@ -83,7 +83,12 @@ jobs:
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
-          cpanm -v --installdeps --notest Geo::GDAL::FFI
+          cpanm -v --installdeps --notest Geo::GDAL::FFI || true
+
+          echo "===== BUILD LOGS ====="
+
+          find ~/.cpanm -name build.log -exec tail -200 {} \; || true
+
           cpanm -v Geo::GDAL::FFI
 
       - name: Install Biodiverse dependencies
