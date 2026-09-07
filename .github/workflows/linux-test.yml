@@ -77,19 +77,15 @@ jobs:
           gdal-config --version
           which gdal-config
           sqlite3 --version
+          pkg-config --modversion gdal
 
       - name: Install Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
-          cpanm -v --installdeps --notest Geo::GDAL::FFI || true
-
-          echo "===== BUILD LOGS ====="
-
-          find ~/.cpanm -name build.log -exec tail -200 {} \; || true
-
-          cpanm -v Geo::GDAL::FFI
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm --notest Geo::GDAL::FFI
 
       - name: Install Biodiverse dependencies
         run: |
@@ -119,37 +115,4 @@ jobs:
           perlbrew use perl-5.38.4
 
           cd BiodiverseR_src/inst/perl
-          cpanm --installdeps --notest .
-
-      - name: Run BiodiverseR tests
-        run: |
-          source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
-
-      - name: Install PAR::Packer
-        run: |
-          source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
-
-          cpanm --notest PAR::Packer
-
-      - name: Build BiodiverseR executable
-        run: |
-          source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
-
-          cd BiodiverseR_src/inst/perl
-
-          pp -o BiodiverseR script/BiodiverseR
-
-          ls -lah BiodiverseR
-
-      - name: Inspect executable
-        run: |
-          file BiodiverseR_src/inst/perl/BiodiverseR
-
-      - name: Upload runtime artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BiodiverseR_linux_x86_64
-          path: BiodiverseR_src/inst/perl/BiodiverseR
+          cpanm --installdeps
