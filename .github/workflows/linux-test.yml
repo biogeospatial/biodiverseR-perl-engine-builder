@@ -1,0 +1,42 @@
+name: Linux Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+
+  perl:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            build-essential \
+            curl \
+            cpanminus \
+            libgsl-dev \
+            gdal-bin \
+            libgdal-dev \
+            sqlite3 \
+            libsqlite3-dev
+
+      - name: Install perlbrew
+        run: |
+          curl -L https://install.perlbrew.pl | bash
+
+      - name: Build Perl 5.38.4
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+
+          perlbrew install perl-5.38.4
+          perlbrew use perl-5.38.4
+
+          perl -V
