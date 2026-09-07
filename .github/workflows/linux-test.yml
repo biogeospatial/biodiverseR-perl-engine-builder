@@ -103,4 +103,8 @@ jobs:
 
       - name: Install BiodiverseR dependencies
         run: |
-       
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd BiodiverseR_src/inst/perl
+          cpanm --installdeps
