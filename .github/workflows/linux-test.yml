@@ -28,6 +28,12 @@ jobs:
             sqlite3 \
             libsqlite3-dev
 
+      - name: Cache perlbrew
+        uses: actions/cache@v4
+        with:
+          path: ~/perl5/perlbrew
+          key: perlbrew-5.38.4-${{ runner.os }}-${{ runner.arch }}
+
       - name: Install perlbrew
         run: |
           curl -L https://install.perlbrew.pl | bash
@@ -36,7 +42,55 @@ jobs:
         run: |
           source ~/perl5/perlbrew/etc/bashrc
 
-          perlbrew install perl-5.38.4
+          if ! perlbrew list | grep -q "perl-5.38.4"; then
+            perlbrew install perl-5.38.4
+          fi
+
           perlbrew use perl-5.38.4
 
           perl -V
+
+      - name: Install cpanminus
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          perl -MCPAN -e 'install App::cpanminus'
+
+          cpanm --version
+
+      - name: Install PDL dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cpanm --notest PDL
+          cpanm -v --notest PDL::GSL::CDF
+
+      - name: Clone Biodiverse
+        run: |
+          git clone --branch master --depth=1 \
+            https://github.com/shawnlaffan/biodiverse.git
+
+      - name: Install Geo::GDAL::FFI
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm Geo::GDAL::FFI
+
+      - name: Install Biodiverse dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd biodiverse
+          cpanm --installdeps --notest .
+
+      - name: Run Biodiverse tests
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd biodiverse
