@@ -112,4 +112,4 @@ jobs:
       - name: Run BiodiverseR tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl
+          perlbrew use perl-5.38.4
