@@ -105,6 +105,10 @@ jobs:
             print defined(&Geo::GDAL::FFI::OGR_G_ConcaveHull) ? "YES\n" : "NO\n";
           '
 
+      - name: Check GDB drivers
+        run: |
+          ogrinfo -
+
       - name: Run Biodiverse tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
