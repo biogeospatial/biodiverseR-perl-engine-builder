@@ -147,4 +147,20 @@ jobs:
 
           cd BiodiverseR_src/inst/perl
 
+          pp_autolink.pl \
+            -x \
+            -o BiodiverseR \
+            script/BiodiverseR
+
+          ls -lah BiodiverseR
+
+      - name: Inspect executable
+        run: |
+          file BiodiverseR_src/inst/perl/BiodiverseR
+
+      - name: Upload runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BiodiverseR_linux_x86_64
+          path: BiodiverseR_src/inst/perl/BiodiverseR
    
