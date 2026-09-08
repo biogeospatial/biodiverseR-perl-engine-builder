@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   pull_request:
 
+env:
+  PERL_CPANM_OPT: -M http://cpan.mirror.digitalpacific.com.au
+
 jobs:
   perl:
 
@@ -60,6 +63,14 @@ jobs:
           perl -MCPAN -e 'install App::cpanminus'
 
           cpanm --version
+
+      - name: Check CPAN resolution
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cpanm --info JSON::MaybeXS || true
+          cpanm --info Text::CSV_XS || true
 
       - name: Install PDL dependencies
         run: |
