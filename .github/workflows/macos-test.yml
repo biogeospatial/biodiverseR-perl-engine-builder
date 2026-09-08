@@ -13,23 +13,25 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: Check existing GIS tools
         run: |
-          brew update
-          brew install gsl
-          brew install sqlite
-          brew install gdal
+          uname -m
 
-      - name: Check GDAL
-        run: |
-          gdalinfo --version
-          sqlite3
+          which gdalinfo || true
+          gdalinfo --version || true
+
+          which gdal-config || true
+          gdal-config --version || true
+
+          which sqlite3 || true
+          sqlite3 --version || true
 
       - name: Cache perlbrew
         uses: actions/cache@v4
         with:
           path: ~/perl5/perlbrew
           key: perlbrew-5.38.4-${{ runner.os }}-${{ runner.arch }}
+
       - name: Install perlbrew
         run: |
           curl -L https://install.perlbrew.pl | bash
@@ -136,10 +138,4 @@ jobs:
       - name: Inspect executable
         run: |
           uname -m
-          file BiodiverseR/inst/perl/BiodiverseR
-
-      - name: Upload runtime artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BiodiverseR_macos_arm64
-          path: BiodiverseR/inst/perl/BiodiverseR
+          file BiodiverseR
