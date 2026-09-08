@@ -126,6 +126,20 @@ jobs:
 
           cpanm --notest PAR::Packer
 
+      - name: Install pp-autolink
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          git clone --depth=1 \
+            https://github.com/shawnlaffan/perl-pp-autolink.git
+
+          cd perl-pp-autolink
+
+          perl Makefile.PL
+          make
+          make install
+
       - name: Build BiodiverseR executable
         run: |
           source ~/perl5/perlbrew/etc/bashrc
@@ -133,16 +147,4 @@ jobs:
 
           cd BiodiverseR_src/inst/perl
 
-          pp -o BiodiverseR script/BiodiverseR
-
-          ls -lah BiodiverseR
-
-      - name: Inspect executable
-        run: |
-          file BiodiverseR_src/inst/perl/BiodiverseR
-
-      - name: Upload runtime artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BiodiverseR_linux_x86_64
-          path: BiodiverseR_src/inst/perl/BiodiverseR
+   
