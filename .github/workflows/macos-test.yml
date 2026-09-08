@@ -85,7 +85,7 @@ jobs:
           git clone --branch master --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
 
-      - name: Install Geo::GDAL::FFI
+      - name: Install --notest Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
