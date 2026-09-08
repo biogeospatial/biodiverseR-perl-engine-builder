@@ -145,6 +145,8 @@ jobs:
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
+          export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib"
+
           cd BiodiverseR_src/inst/perl
 
           pp_autolink.pl \
