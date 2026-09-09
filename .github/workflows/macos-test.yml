@@ -5,7 +5,7 @@ on:
   pull_request:
 
 env:
-  PERL_CPANM_OPT: -M http://cpan.mirror.digitalpacific.com.au
+  PERL_CPANM_OPT: -M https://www.cpan.org
 
 jobs:
   perl:
