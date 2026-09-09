@@ -151,6 +151,14 @@ When publishing a new runtime release:
 6. Update the `current` field if the new release should become the default version.
 7. Commit and push the updated manifest.
 
+### Release Automation
+
+Runtime packages are built and validated using GitHub Actions workflows for supported platforms.
+
+Releases are intended to be published from version tags, allowing platform-specific runtime packages, release metadata and checksums to be generated and published in a consistent manner.
+
+The release manifest (`releases.json`) acts as the authoritative source of runtime version information used by BiodiverseR.
+
 ## Relationship to BiodiverseR
 
 This repository serves as the distribution point for BiodiverseR runtimes.
