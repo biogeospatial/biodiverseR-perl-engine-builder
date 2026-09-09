@@ -107,7 +107,7 @@ jobs:
           perlbrew use perl-5.38.4
 
           cd biodiverse
-          prove -j4 -l t
+          prove -j1 -l t
 
       - name: Clone BiodiverseR
         run: |
