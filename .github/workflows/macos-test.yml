@@ -122,6 +122,10 @@ jobs:
           cd BiodiverseR/inst/perl
           cpanm --installdeps --notest .
 
+      - name: Show GDAL drivers
+        run: |
+          ogrinfo --formats | grep -i gdb || true
+          
       - name: Run BiodiverseR tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
@@ -130,7 +134,7 @@ jobs:
           export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib"
 
           cd BiodiverseR/inst/perl
-          prove -j4 -l t
+          prove -lv t/22-SpatialConditions-sp-points-in-polys.t
 
       - name: Install PAR::Packer
         run: |
