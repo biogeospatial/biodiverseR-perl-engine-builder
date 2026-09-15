@@ -87,10 +87,6 @@ jobs:
           git clone --branch master --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
 
-      - name: Configure Alien builds
-        run: |
-          echo "ALIEN_INSTALL_TYPE=share" >> $GITHUB_ENV            
-
       - name: Install --notest Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
@@ -99,8 +95,7 @@ jobs:
           cpanm --installdeps --notest Alien::sqlite
           cpanm --notest Alien::sqlite
 
-          cpanm --installdeps --notest Geo::GDAL::FFI
-          cpanm --notest Geo::GDAL::FFI
+          cpanm Geo::GDAL::FFI
 
       - name: Install Biodiverse dependencies
         run: |
