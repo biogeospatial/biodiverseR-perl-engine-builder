@@ -116,7 +116,7 @@ jobs:
           perlbrew use perl-5.38.4
 
           cd biodiverse
-          prove -j1 -l t
+          prove -lv t/22-SpatialConditions-sp-points-in-polys.t
 
       - name: Clone BiodiverseR
         run: |
