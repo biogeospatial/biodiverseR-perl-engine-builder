@@ -151,9 +151,10 @@ jobs:
           zip -r "../../${ZIPNAME}" BiodiverseR
 
           echo "Created ZIP: ${ZIPNAME}"
-
+          
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
         with:
           name: BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}
-          path: BiodiverseR/${{ github.ref_name || 'dev' }}.zip
+          path: BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}.zip
+
