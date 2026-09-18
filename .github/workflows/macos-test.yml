@@ -148,7 +148,8 @@ jobs:
           cd BiodiverseR/inst/perl
 
           # Create ZIP containing the executable
-          zip -r "../../${ZIPNAME}" BiodiverseR
+          zip -r "../../../${ZIPNAME}" BiodiverseR
+
 
           echo "Created ZIP: ${ZIPNAME}"
 
@@ -157,5 +158,3 @@ jobs:
         with:
           name: BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}
           path: ${{ github.workspace }}/BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}.zip
-          
-
