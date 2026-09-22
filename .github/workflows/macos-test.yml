@@ -122,15 +122,23 @@ jobs:
           perlbrew use perl-5.38.4
 
           cpanm --notest PAR::Packer
+          git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
+
+          cd perl-pp-autolink
+          perl Makefile.PL
+          make
+          make install
 
       - name: Build BiodiverseR executable
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
+          export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib:$PERL5LIB"
+          
           cd BiodiverseR/inst/perl
 
-          pp -o BiodiverseR script/BiodiverseR
+          pp_autolink.pl -x -o BiodiverseR script/BiodiverseR
 
           ls -lah BiodiverseR
 
