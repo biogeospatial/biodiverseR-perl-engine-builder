@@ -50,7 +50,6 @@ jobs:
           fi
 
           perlbrew use perl-5.38.4
-
           perl -V
 
       - name: Install cpanminus
@@ -79,6 +78,12 @@ jobs:
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
+
+          export ALIEN_INSTALL_TYPE=share
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+
+          cpanm --installdeps --notest Alien::gdal
+          cpanm --notest -v Alien::gdal
 
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm Geo::GDAL::FFI
@@ -128,6 +133,7 @@ jobs:
           perlbrew use perl-5.38.4
 
           cpanm --notest PAR::Packer
+
           git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
 
           cd perl-pp-autolink
@@ -140,6 +146,7 @@ jobs:
           which pkg-config
           pkg-config --modversion gdal || true
           gdal-config --version || true
+          perl -MAlien::gdal -e 'print Alien::gdal->dist_dir,"\n"' || true
 
       - name: Build BiodiverseR executable
         run: |
