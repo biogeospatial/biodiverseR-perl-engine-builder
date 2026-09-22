@@ -135,12 +135,20 @@ jobs:
           make
           make install
 
+      - name: GDAL diagnostics
+        run: |
+          which pkg-config
+          pkg-config --modversion gdal || true
+          gdal-config --version || true
+
       - name: Build BiodiverseR executable
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perlbrew use perl-5.38.4
 
           export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib:$PERL5LIB"
+
+          which pp_autolink.pl
 
           cd BiodiverseR/inst/perl
 
@@ -155,15 +163,12 @@ jobs:
 
       - name: Package runtime ZIP with version
         run: |
-          # Detect version from tag or fallback to dev
           VERSION="${GITHUB_REF_NAME:-dev}"
           ZIPNAME="BiodiverseR_macos_arm64_${VERSION}.zip"
 
           cd BiodiverseR/inst/perl
 
-          # Create ZIP containing the executable
           zip -r "../../../${ZIPNAME}" BiodiverseR
-
 
           echo "Created ZIP: ${ZIPNAME}"
 
