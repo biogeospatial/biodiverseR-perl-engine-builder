@@ -4,6 +4,12 @@ on:
   workflow_dispatch:
   pull_request:
 
+env:
+  BD_BRANCH: master
+  BD_NO_ALIEN_GTKSTACK: 1
+  PKG_CONFIG_PATH: /opt/homebrew/lib/pkgconfig
+  PATH: /opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
 jobs:
   perl:
 
@@ -135,7 +141,7 @@ jobs:
           perlbrew use perl-5.38.4
 
           export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib:$PERL5LIB"
-          
+
           cd BiodiverseR/inst/perl
 
           pp_autolink.pl -x -o BiodiverseR script/BiodiverseR
