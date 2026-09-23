@@ -148,7 +148,7 @@ jobs:
           pkg-config --modversion gdal || true
           gdal-config --version || true
           perl -MAlien::gdal -e 'print Alien::gdal->dist_dir,"\n"' || true
-
+         
       - name: Inspect Alien GDAL
         run: |
          source ~/perl5/perlbrew/etc/bashrc
@@ -158,8 +158,7 @@ jobs:
 
          echo "Alien::gdal dir: $GDAL_DIR"
 
-         find "$GDAL_DIR" -name gdal.pc || true
-         find "$GDAL_DIR" -type d -name gdal || true    
+         find "$GDAL_DIR"   
 
       - name: Build BiodiverseR executable
         run: |
