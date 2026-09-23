@@ -158,6 +158,15 @@ jobs:
 
          echo "Alien::gdal dir: $GDAL_DIR"
 
+         find "$GDAL_DIR"
+
+       - name: Show Alien GDAL contents
+        run: |
+         source ~/perl5/perlbrew/etc/bashrc
+         perlbrew use perl-5.38.4
+
+         GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
+
          find "$GDAL_DIR"   
 
       - name: Build BiodiverseR executable
