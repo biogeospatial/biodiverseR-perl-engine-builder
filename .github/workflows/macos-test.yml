@@ -50,6 +50,7 @@ jobs:
           fi
 
           perlbrew use perl-5.38.4
+
           perl -V
 
       - name: Install cpanminus
