@@ -208,17 +208,6 @@ jobs:
           uname -m
           file BiodiverseR/inst/perl/BiodiverseR
 
-      - name: Package runtime ZIP with version
-        run: |
-          VERSION="${GITHUB_REF_NAME:-dev}"
-          ZIPNAME="BiodiverseR_macos_arm64_${VERSION}.zip"
-
-          cd BiodiverseR/inst/perl
-
-          zip -r "../../../${ZIPNAME}" BiodiverseR
-
-          echo "Created ZIP: ${ZIPNAME}"
-
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
         with:
