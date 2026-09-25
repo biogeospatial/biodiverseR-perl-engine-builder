@@ -11,8 +11,8 @@
       },
 
       "macos": {
-        "url": "",
-        "sha256": ""
+        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_macos_arm64_v0.1.0-alpha.zip",
+        "sha256": "adf84f347338b9dfe949b52fd00a2b8cb551975db3e9f4c1d425a73a97318129"
       },
 
       "linux": {
