@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+
+  build-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Future Windows release build"
+
+  build-macos:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Future macOS release build"
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Future Linux release build"
