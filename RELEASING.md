@@ -75,24 +75,49 @@ sha256sum BiodiverseR_linux_x64.zip
 
 Add release metadata and checksums.
 
+### Manifest Compatibility
+ 
+The release manifest currently retains the legacy top-level `url` and
+`sha256` fields for backward compatibility with previously released
+versions of BiodiverseR.
+ 
+Newer versions of BiodiverseR support platform-specific release metadata
+using the `windows`, `macos` and `linux` sections. Older versions expect
+the runtime URL and checksum to be available at the top level of the
+release entry.
+ 
+Until support for the legacy manifest format is no longer required, the
+top-level `url` and `sha256` fields should continue to reference the
+Windows runtime release, while platform-specific metadata is maintained
+in the `windows`, `macos` and `linux` sections.
+
+This allows previously released versions of BiodiverseR to continue
+downloading Windows runtimes while newer versions can use
+platform-specific release metadata.
+
 Example:
 
 ```json
 {
-  "current": "v0.2.0",
+  "current": "v0.1.0-alpha",
   "releases": {
-    "v0.2.0": {
+    "v0.1.0-alpha": {
+      "url": "https://...windows.zip",
+      "sha256": "windows-sha",
+
       "windows": {
-        "url": "...",
-        "sha256": "..."
+        "url": "https://...windows.zip",
+        "sha256": "windows-sha"
       },
+
       "macos": {
-        "url": "...",
-        "sha256": "..."
+        "url": "",
+        "sha256": ""
       },
+
       "linux": {
-        "url": "...",
-        "sha256": "..."
+        "url": "",
+        "sha256": ""
       }
     }
   }
