@@ -204,6 +204,26 @@ jobs:
 
           kill $SERVER_PID || true
 
+      - name: Test BiodiverseR runtime installation
+        run: |
+          rm -rf ~/Library/Application\ Support/BiodiverseR/runtime || true
+
+          Rscript - <<'RSCRIPT'
+          install.packages("pak", repos = "https://cloud.r-project.org")
+
+          pak::pak(
+            "biogeospatial/BiodiverseR@101-generalise-runtime-startup-and-installation-across-platforms"
+          )
+
+          library(BiodiverseR)
+
+          bd <- BiodiverseR::basedata$new()
+
+          stopifnot(bd$server_status())
+
+          cat("Runtime installation and startup succeeded\n")
+          RSCRIPT
+
       - name: Inspect executable
         run: |
           uname -m
@@ -214,3 +234,4 @@ jobs:
         with:
           name: BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}
           path: BiodiverseR/inst/perl/BiodiverseR
+
