@@ -142,32 +142,32 @@ jobs:
           make
           make install
 
-      - name: GDAL diagnostics
-        run: |
-          which pkg-config
-          pkg-config --modversion gdal || true
-          gdal-config --version || true
-          perl -MAlien::gdal -e 'print Alien::gdal->dist_dir,"\n"' || true
+#      - name: GDAL diagnostics
+#        run: |
+#          which pkg-config
+#          pkg-config --modversion gdal || true
+#          gdal-config --version || true
+#          perl -MAlien::gdal -e 'print Alien::gdal->dist_dir,"\n"' || true
          
-      - name: Inspect Alien GDAL
-        run: |
-         source ~/perl5/perlbrew/etc/bashrc
-         perlbrew use perl-5.38.4
+#      - name: Inspect Alien GDAL
+#        run: |
+#         source ~/perl5/perlbrew/etc/bashrc
+#         perlbrew use perl-5.38.4
+#
+#         GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
+#
+#         echo "Alien::gdal dir: $GDAL_DIR"
+#
+#         find "$GDAL_DIR"
 
-         GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
-
-         echo "Alien::gdal dir: $GDAL_DIR"
-
-         find "$GDAL_DIR"
-
-      - name: Show Alien GDAL contents
-        run: |
-         source ~/perl5/perlbrew/etc/bashrc
-         perlbrew use perl-5.38.4
-
-         GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
-
-         find "$GDAL_DIR"   
+#      - name: Show Alien GDAL contents
+#        run: |
+#         source ~/perl5/perlbrew/etc/bashrc
+#         perlbrew use perl-5.38.4
+#
+#        GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
+#
+#         find "$GDAL_DIR"   
 
       - name: Build BiodiverseR executable
         run: |
@@ -193,7 +193,8 @@ jobs:
 
           chmod +x BiodiverseR
 
-          ./BiodiverseR daemon -l http://127.0.0.1:3001 > runtime.log 2>&1 & SERVER_PID=$!
+          ./BiodiverseR daemon -l http://127.0.0.1:3001 > runtime.log 2>&1 &
+          SERVER_PID=$!
 
           sleep 10
 
@@ -212,4 +213,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}
-          path: ${{ github.workspace }}/BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}.zip
+          path: BiodiverseR/inst/perl/BiodiverseR
