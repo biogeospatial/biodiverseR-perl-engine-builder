@@ -8,7 +8,7 @@ env:
   BD_BRANCH: master
   BD_NO_ALIEN_GTKSTACK: 1
   PKG_CONFIG_PATH: /opt/homebrew/lib/pkgconfig
-  PATH: /opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin
+  PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 jobs:
   perl:
