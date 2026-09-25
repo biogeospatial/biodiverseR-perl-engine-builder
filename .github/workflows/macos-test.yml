@@ -66,14 +66,6 @@ jobs:
 
           cpanm --version
 
-      - name: Check CPAN resolution
-        run: |
-          source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
-
-          cpanm --info JSON::MaybeXS || true
-          cpanm --info Text::CSV_XS || true
-
       - name: Install PDL dependencies
         run: |
           source ~/perl5/perlbrew/etc/bashrc
@@ -157,6 +149,25 @@ jobs:
           pp -o BiodiverseR script/BiodiverseR
 
           ls -lah BiodiverseR
+
+      - name: Test BiodiverseR runtime startup
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-5.38.4
+
+          cd BiodiverseR/inst/perl
+
+          chmod +x BiodiverseR
+
+          ./BiodiverseR daemon -l http://127.0.0.1:3001 > runtime.log 2>&1 & SERVER_PID=$!
+
+          sleep 10
+
+          cat runtime.log
+
+          curl --fail http://127.0.0.1:3001/api_key
+
+          kill $SERVER_PID || true
 
       - name: Inspect executable
         run: |
