@@ -207,17 +207,6 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
 
-      - name: Check R
-        run: |
-          which R
-          which Rscript
-          Rscript --version
-
-      - name: Show PATH
-        run: |
-          echo "$PATH"
-          which Rscript || true
-
       - name: Test BiodiverseR runtime installation
         run: |
           rm -rf ~/Library/Application\ Support/BiodiverseR/runtime || true
@@ -230,6 +219,10 @@ jobs:
           )
 
           library(BiodiverseR)
+
+          print(get_release_metadata(
+            "https://raw.githubusercontent.com/biogeospatial/biodiverseR-perl-engine-builder/main/releases.json"
+          ))
 
           bd <- BiodiverseR::basedata$new()
 
