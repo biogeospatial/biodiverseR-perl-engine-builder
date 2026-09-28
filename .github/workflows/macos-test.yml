@@ -269,9 +269,16 @@ jobs:
           echo "Contents:"
           find BiodiverseR/inst/perl -maxdepth 1 -type f
 
+      - name: Get build version as SHA of BiodiverseR repo
+        id: build_version
+        run: |
+          cd BiodiverseR
+          v=$(git rev-parse --short HEAD)
+          echo "BD_VERSION=${v}" >> "$
+
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BiodiverseR_macos_arm64_${{ github.ref_name || 'dev' }}
+          name: BiodiverseR_macos_arm64_${{ steps.build_version.outputs.BD_VERSION }}
           path: BiodiverseR/inst/perl/BiodiverseR
 
