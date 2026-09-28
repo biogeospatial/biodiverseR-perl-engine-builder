@@ -6,6 +6,7 @@ on:
 
 env:
   BD_BRANCH: master
+  BDR_BRANCH: 101-generalise-runtime-startup-and-installation-across-platforms
   BD_NO_ALIEN_GTKSTACK: 1
   PKG_CONFIG_PATH: /opt/homebrew/lib/pkgconfig
   PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
@@ -72,7 +73,7 @@ jobs:
 
       - name: Clone Biodiverse
         run: |
-          git clone --branch master --depth=1 \
+          git clone --branch $BD_BRANCH --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
 
       - name: Install Geo::GDAL::FFI
@@ -107,7 +108,7 @@ jobs:
 
       - name: Clone BiodiverseR
         run: |
-          git clone --branch main --depth=1 \
+          git clone --branch $BDR_BRANCH --depth=1 \
             https://github.com/biogeospatial/BiodiverseR.git
 
       - name: Install BiodiverseR dependencies
@@ -215,7 +216,10 @@ jobs:
           install.packages("pak", repos = "https://cloud.r-project.org")
 
           pak::pak(
-            "biogeospatial/BiodiverseR@101-generalise-runtime-startup-and-installation-across-platforms"
+            sprintf(
+              "biogeospatial/BiodiverseR@%s",
+              Sys.getenv("BDR_BRANCH")
+            )
           )
 
           library(BiodiverseR)
