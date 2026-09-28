@@ -274,7 +274,7 @@ jobs:
         run: |
           cd BiodiverseR
           v=$(git rev-parse --short HEAD)
-          echo "BD_VERSION=${v}" >> "$
+          echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
