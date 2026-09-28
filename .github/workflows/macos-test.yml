@@ -237,8 +237,13 @@ jobs:
             BiodiverseR:::runtime_available(),
             "\n"
           )
-
-          bd <- BiodiverseR::basedata$new()
+          bd <- BiodiverseR::basedata$new(
+            filename = system.file(
+              "extdata",
+              "example.bds",
+              package = "BiodiverseR"
+            )
+          )
 
           stopifnot(bd$server_status())
 
