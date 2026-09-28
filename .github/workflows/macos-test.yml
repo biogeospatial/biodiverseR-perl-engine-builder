@@ -220,9 +220,23 @@ jobs:
 
           library(BiodiverseR)
 
-          print(get_release_metadata(
-            "https://raw.githubusercontent.com/biogeospatial/biodiverseR-perl-engine-builder/main/releases.json"
-          ))
+          cat(
+            "Platform: ",
+            BiodiverseR:::get_runtime_platform(),
+            "\n"
+          )
+
+          cat(
+            "Runtime directory: ",
+            BiodiverseR:::get_biodiverser_runtime_dir(),
+            "\n"
+          )
+
+          cat(
+            "Runtime available: ",
+            BiodiverseR:::runtime_available(),
+            "\n"
+          )
 
           bd <- BiodiverseR::basedata$new()
 
