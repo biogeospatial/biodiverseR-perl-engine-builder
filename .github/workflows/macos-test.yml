@@ -250,6 +250,16 @@ jobs:
           uname -m
           file BiodiverseR/inst/perl/BiodiverseR
 
+      - name: Check build output
+        run: |
+          ls -lah BiodiverseR/inst/perl
+
+          echo "Executable details:"
+          file BiodiverseR/inst/perl/BiodiverseR || true
+
+          echo "Contents:"
+          find BiodiverseR/inst/perl -maxdepth 1 -type f
+
       - name: Upload runtime artifact
         uses: actions/upload-artifact@v4
         with:
