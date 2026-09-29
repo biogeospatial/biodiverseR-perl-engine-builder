@@ -4,13 +4,6 @@ on:
   workflow_dispatch:
   pull_request:
 
-env:
-  BD_BRANCH: master
-  BDR_BRANCH: 101-generalise-runtime-startup-and-installation-across-platforms
-  BD_NO_ALIEN_GTKSTACK: 1
-  PKG_CONFIG_PATH: /opt/homebrew/lib/pkgconfig
-  PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-
 jobs:
   perl:
 
@@ -19,6 +12,40 @@ jobs:
     steps:
 
       - uses: actions/checkout@v7
+
+      - name: Load runtime configuration
+        id: config
+        run: |
+          python3 - <<'PY'
+          import yaml
+
+          with open(".github/runtime-config.yml") as f:
+              cfg = yaml.safe_load(f)
+
+          with open("config.env", "w") as out:
+              out.write(f"PERL_VERSION={cfg['perl_version']}\n")
+              out.write(f"BD_BRANCH={cfg['biodiverse']['branch']}\n")
+              out.write(f"BDR_BRANCH={cfg['biodiverser']['branch']}\n")
+              out.write(f"RUNTIME_TEST_PORT={cfg['runtime']['test_port']}\n")
+              out.write(
+                  f"BD_NO_ALIEN_GTKSTACK={int(cfg['build']['no_alien_gtkstack'])}\n"
+              )
+              out.write(
+                  f"PKG_CONFIG_PATH={cfg['macos']['pkg_config_path']}\n"
+              )
+              out.write(
+                  f"PATH={cfg['macos']['path']}\n"
+              )
+          PY
+
+          cat config.env >> "$GITHUB_ENV"
+
+      - name: Show config values
+        run: |
+          echo "PERL_VERSION=$PERL_VERSION"
+          echo "BD_BRANCH=$BD_BRANCH"
+          echo "BDR_BRANCH=$BDR_BRANCH"
+          echo "RUNTIME_TEST_PORT=$RUNTIME_TEST_PORT"
 
       - name: Install system dependencies
         run: |
@@ -36,28 +63,28 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/perl5/perlbrew
-          key: perlbrew-5.38.4-${{ runner.os }}
+          key: perlbrew-${{ env.PERL_VERSION }}-${{ runner.os }}
 
       - name: Install perlbrew
         run: |
           curl -L https://install.perlbrew.pl | bash
 
-      - name: Build Perl 5.38.4
+      - name: Build Perl
         run: |
           source ~/perl5/perlbrew/etc/bashrc
 
-          if ! perlbrew list | grep -q "perl-5.38.4"; then
-            perlbrew install perl-5.38.4
+          if ! perlbrew list | grep -q "perl-${PERL_VERSION}"; then
+           perlbrew install perl-${PERL_VERSION}
           fi
 
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           perl -V
 
       - name: Install cpanminus
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           perl -MCPAN -e 'install App::cpanminus'
 
@@ -66,7 +93,7 @@ jobs:
       - name: Install PDL dependencies
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           cpanm --notest PDL
           cpanm -v --notest PDL::GSL::CDF
@@ -79,7 +106,7 @@ jobs:
       - name: Install Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           export ALIEN_INSTALL_TYPE=share
           export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
@@ -93,7 +120,7 @@ jobs:
       - name: Install Biodiverse dependencies
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           cd biodiverse
           cpanm --installdeps --notest .
@@ -101,7 +128,7 @@ jobs:
       - name: Run Biodiverse tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           cd biodiverse
           prove -j4 -l t
@@ -114,7 +141,7 @@ jobs:
       - name: Install BiodiverseR dependencies
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           cd BiodiverseR/inst/perl
           cpanm --installdeps --notest .
@@ -122,7 +149,7 @@ jobs:
       - name: Run BiodiverseR tests
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib"
 
@@ -132,7 +159,7 @@ jobs:
       - name: Install PAR::Packer
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           cpanm --notest PAR::Packer
 
@@ -153,7 +180,7 @@ jobs:
 #      - name: Inspect Alien GDAL
 #        run: |
 #         source ~/perl5/perlbrew/etc/bashrc
-#         perlbrew use perl-5.38.4
+#         perlbrew use perl-${PERL_VERSION}
 #
 #         GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
 #
@@ -164,7 +191,7 @@ jobs:
 #      - name: Show Alien GDAL contents
 #        run: |
 #         source ~/perl5/perlbrew/etc/bashrc
-#         perlbrew use perl-5.38.4
+#         perlbrew use perl-${PERL_VERSION}
 #
 #        GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
 #
@@ -173,7 +200,7 @@ jobs:
       - name: Build BiodiverseR executable
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib:$PERL5LIB"
 
@@ -188,20 +215,20 @@ jobs:
       - name: Test BiodiverseR runtime startup
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          perlbrew use perl-5.38.4
+          perlbrew use perl-${PERL_VERSION}
 
           cd BiodiverseR/inst/perl
 
           chmod +x BiodiverseR
 
-          ./BiodiverseR daemon -l http://127.0.0.1:3001 > runtime.log 2>&1 &
+          ./BiodiverseR daemon -l http://127.0.0.1:${RUNTIME_TEST_PORT} > runtime.log 2>&1 &
           SERVER_PID=$!
 
           sleep 10
 
           cat runtime.log
 
-          curl --fail http://127.0.0.1:3001/api_key
+          curl --fail http://127.0.0.1:${RUNTIME_TEST_PORT}/api_key
 
           kill $SERVER_PID || true
 

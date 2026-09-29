@@ -1,0 +1,19 @@
+# Runtime build configuration shared across all platforms.
+
+perl_version: "5.38.4"
+
+biodiverse:
+  branch: "master"
+
+biodiverser:
+  branch: "101-generalise-runtime-startup-and-installation-across-platforms"
+
+runtime:
+  test_port: 3001
+
+build:
+  no_alien_gtkstack: true
+
+macos:
+  pkg_config_path: "/opt/homebrew/lib/pkgconfig"
+  path: "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
