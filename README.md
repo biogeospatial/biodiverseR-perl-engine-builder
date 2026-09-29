@@ -111,6 +111,7 @@ Platform-specific runtime metadata. BiodiverseR selects the entry that matches t
     "sha256": "..."
   }
 }
+```
 
 If the downloaded package does not match the published checksum, BiodiverseR will reject the download and abort installation.
 
