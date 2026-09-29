@@ -13,36 +13,21 @@ jobs:
 
       - uses: actions/checkout@v7
 
-      - name: Check yq
-        run: |
-          yq --version
-
       - name: Load runtime configuration
-        id: config
         run: |
-          python3 - <<'PY'
-          import yaml
+          echo "PERL_VERSION=$(yq -r '.perl_version' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          with open(".github/runtime-config.yml") as f:
-              cfg = yaml.safe_load(f)
+          echo "BD_BRANCH=$(yq -r '.biodiverse.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          with open("config.env", "w") as out:
-              out.write(f"PERL_VERSION={cfg['perl_version']}\n")
-              out.write(f"BD_BRANCH={cfg['biodiverse']['branch']}\n")
-              out.write(f"BDR_BRANCH={cfg['biodiverser']['branch']}\n")
-              out.write(f"RUNTIME_TEST_PORT={cfg['runtime']['test_port']}\n")
-              out.write(
-                  f"BD_NO_ALIEN_GTKSTACK={int(cfg['build']['no_alien_gtkstack'])}\n"
-              )
-              out.write(
-                  f"PKG_CONFIG_PATH={cfg['macos']['pkg_config_path']}\n"
-              )
-              out.write(
-                  f"PATH={cfg['macos']['path']}\n"
-              )
-          PY
+          echo "BDR_BRANCH=$(yq -r '.biodiverser.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          cat config.env >> "$GITHUB_ENV"
+          echo "RUNTIME_TEST_PORT=$(yq -r '.runtime.test_port' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "BD_NO_ALIEN_GTKSTACK=$(yq -r '.build.no_alien_gtkstack' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "PKG_CONFIG_PATH=$(yq -r '.macos.pkg_config_path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "PATH=$(yq -r '.macos.path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
       - name: Show config values
         run: |
@@ -78,7 +63,7 @@ jobs:
           source ~/perl5/perlbrew/etc/bashrc
 
           if ! perlbrew list | grep -q "perl-${PERL_VERSION}"; then
-           perlbrew install perl-${PERL_VERSION}
+            perlbrew install perl-${PERL_VERSION}
           fi
 
           perlbrew use perl-${PERL_VERSION}
