@@ -15,7 +15,7 @@ jobs:
 
       - name: Check yq
         run: |
-        yq --version
+          yq --version
 
       - name: Load runtime configuration
         id: config
