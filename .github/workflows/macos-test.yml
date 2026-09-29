@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Check yq
-      run: |
+        run: |
         yq --version
 
       - name: Load runtime configuration
