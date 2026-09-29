@@ -29,13 +29,6 @@ jobs:
 
           echo "PATH=$(yq -r '.macos.path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-      - name: Show config values
-        run: |
-          echo "PERL_VERSION=$PERL_VERSION"
-          echo "BD_BRANCH=$BD_BRANCH"
-          echo "BDR_BRANCH=$BDR_BRANCH"
-          echo "RUNTIME_TEST_PORT=$RUNTIME_TEST_PORT"
-
       - name: Install system dependencies
         run: |
           brew update
