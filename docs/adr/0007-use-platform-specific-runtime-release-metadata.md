@@ -58,7 +58,7 @@ The release manifest structure shall be:
         "url": "...",
         "sha256": "..."
       },
-      "macos-arm64": {
+      "macos": {
         "url": "...",
         "sha256": "..."
       },
@@ -129,7 +129,7 @@ Example:
   "windows": {
     "current": "v0.2.0"
   },
-  "macos-arm64": {
+  "macos": {
     "current": "v0.2.0"
   }
 }
