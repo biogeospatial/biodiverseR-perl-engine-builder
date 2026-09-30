@@ -19,8 +19,7 @@ Platform-specific Perl versions may be used where required.
 The Windows runtime uses Strawberry Perl 5.38.4.1 because it matches
 the dependency stack used to build the Biodiverse GUI.
 
-Runtime builders are not required to use identical Perl versions across
-all platforms.
+Runtime builders may use platform-specific Perl versions where required to align with platform dependency stacks, compatibility requirements, or build tooling.
 
 ## Rationale
 

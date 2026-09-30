@@ -15,19 +15,19 @@ jobs:
 
       - name: Load runtime configuration
         run: |
-          echo "PERL_VERSION=$(yq -r '.perl_version' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "PERL_VERSION=$(yq -r '.platforms.macos.perl.version' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          echo "BD_BRANCH=$(yq -r '.biodiverse.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "BD_BRANCH=$(yq -r '.globals.biodiverse.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          echo "BDR_BRANCH=$(yq -r '.biodiverser.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "BDR_BRANCH=$(yq -r '.globals.biodiverser.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          echo "RUNTIME_TEST_PORT=$(yq -r '.runtime.test_port' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "RUNTIME_TEST_PORT=$(yq -r '.globals.runtime.test_port' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          echo "BD_NO_ALIEN_GTKSTACK=$(yq -r '.build.no_alien_gtkstack' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "BD_NO_ALIEN_GTKSTACK=$(yq -r '.globals.build.no_alien_gtkstack' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          echo "PKG_CONFIG_PATH=$(yq -r '.macos.pkg_config_path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$(yq -r '.platforms.macos.pkg_config_path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
-          echo "PATH=$(yq -r '.macos.path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+          echo "PATH=$(yq -r '.platforms.macos.path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
 
       - name: Install system dependencies
         run: |

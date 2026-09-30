@@ -7,10 +7,7 @@ Status: Accepted
 The BiodiverseR runtime build process uses separate GitHub Actions
 workflows for Windows, macOS, and Linux.
 
-As runtime support expands across multiple operating systems, shared
-build settings such as Perl versions, Biodiverse branches,
-BiodiverseR branches, runtime test ports, and platform-specific build
-configuration need to be managed consistently.
+As runtime support expands across multiple operating systems, shared build settings and platform-specific settings need to be managed consistently.
 
 A shared configuration source is needed to reduce duplication and make
 it easier to keep runtime builders aligned across platforms.
@@ -24,29 +21,40 @@ GitHub Actions workflows will load configuration values from this file at
 runtime using `yq`.
 
 Shared configuration values and platform-specific configuration values
-will be maintained in a single location.
+will be maintained in a single location. Configuration is divided into a globals section for settings shared across platforms and a platforms section for settings that may differ between platforms.
 
 Example configuration:
 
 ```yaml
-biodiverse:
-  branch: master
+globals:
+  biodiverse:
+    branch: master
 
-biodiverser:
-  branch: main
+  biodiverser:
+    branch: main
 
-runtime:
-  test_port: 3001
+  runtime:
+    test_port: 3001
+
+  build:
+    no_alien_gtkstack: true
 
 platforms:
   windows:
-    perl_version: 5.38.4.1
+    perl:
+      version: 5.38.4.1
 
   macos:
-    perl_version: 5.38.4
+    perl:
+      version: 5.38.4
+
+    pkg_config_path: "/opt/homebrew/lib/pkgconfig"
+
+    path: "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
   linux:
-    perl_version: 5.38.4
+    perl:
+      version: 5.38.4
 ```
 
 ## Rationale
