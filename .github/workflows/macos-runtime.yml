@@ -116,6 +116,14 @@ jobs:
           perlbrew use perl-${PERL_VERSION}
 
           export ALIEN_INSTALL_TYPE=share
+
+          export PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig
+          export CMAKE_PREFIX_PATH=/opt/homebrew
+
+          export CPPFLAGS="-I/opt/homebrew/include"
+          export CFLAGS="-I/opt/homebrew/include"
+          export CXXFLAGS="-I/opt/homebrew/include"
+
           export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
 
           cpanm --installdeps --notest Alien::gdal
