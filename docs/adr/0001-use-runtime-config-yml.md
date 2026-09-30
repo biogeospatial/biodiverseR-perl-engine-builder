@@ -7,10 +7,12 @@ Status: Accepted
 The BiodiverseR runtime build process uses separate GitHub Actions
 workflows for Windows, macOS, and Linux.
 
-As runtime support expands across multiple operating systems, shared build settings and platform-specific settings need to be managed consistently.
+As runtime support expands across multiple operating systems, shared
+build settings and platform-specific settings need to be managed
+consistently.
 
 A shared configuration source is needed to reduce duplication and make
-it easier to keep runtime builders aligned across platforms.
+it easier to manage runtime builder configuration across platforms.
 
 ## Decision
 
@@ -21,7 +23,11 @@ GitHub Actions workflows will load configuration values from this file at
 runtime using `yq`.
 
 Shared configuration values and platform-specific configuration values
-will be maintained in a single location. Configuration is divided into a globals section for settings shared across platforms and a platforms section for settings that may differ between platforms.
+will be maintained in a single location.
+
+Configuration is divided into a `globals` section for settings shared
+across platforms and a `platforms` section for settings that may differ
+between platforms.
 
 Example configuration:
 

@@ -233,23 +233,6 @@ jobs:
 
           library(BiodiverseR)
 
-          cat(
-            "Platform: ",
-            BiodiverseR:::get_runtime_platform(),
-            "\n"
-          )
-
-          cat(
-            "Runtime directory: ",
-            BiodiverseR:::get_biodiverser_runtime_dir(),
-            "\n"
-          )
-
-          cat(
-            "Runtime available: ",
-            BiodiverseR:::runtime_available(),
-            "\n"
-          )
           bd <- BiodiverseR::basedata$new(
             filename = system.file(
               "extdata",
