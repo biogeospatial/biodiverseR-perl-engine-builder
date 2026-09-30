@@ -7,9 +7,6 @@ on:
         required: true
         type: string
 
-  workflow_dispatch:
-  pull_request:
-
 jobs:
   perl:
 
@@ -17,7 +14,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
       - name: Load runtime configuration
         run: |
@@ -274,8 +271,29 @@ jobs:
           v=$(git rev-parse --short HEAD)
           echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
+      - name: Get release version
+        if: inputs.build_type == 'release'
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
+      - name: Package release artifact
+        if: inputs.build_type == 'release'
+        run: |
+          cd BiodiverseR/inst/perl
+
+          zip \
+            BiodiverseR_macos_arm64_${VERSION}.zip \
+            BiodiverseR
+
+      - name: Upload release artifact
+        if: inputs.build_type == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: BiodiverseR_macos_arm64_${{ env.VERSION }}
+          path: BiodiverseR/inst/perl/BiodiverseR_macos_arm64_${{ env.VERSION }}.zip
+
       - name: Upload CI artifact
-        if: inputs.build_type == 'ci'
+        if: ${{ inputs.build_type != 'release' }}
         uses: actions/upload-artifact@v4
         with:
           name: BiodiverseR_macos_arm64_${{ steps.build_version.outputs.BD_VERSION }}
