@@ -7,6 +7,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   perl:
 
@@ -299,6 +302,14 @@ jobs:
         with:
           name: BiodiverseR_macos_arm64_${{ env.VERSION }}
           path: BiodiverseR/inst/perl/BiodiverseR_macos_arm64_${{ env.VERSION }}.zip
+
+      - name: Upload release asset
+        if: inputs.build_type == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            BiodiverseR/inst/perl/BiodiverseR_macos_arm64_${{ env.VERSION }}.zip
+
 
       - name: Upload CI artifact
         if: ${{ inputs.build_type != 'release' }}
