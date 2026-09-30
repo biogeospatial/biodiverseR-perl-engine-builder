@@ -1,6 +1,12 @@
-name: macOS Test
+name: macOS Runtime
 
 on:
+  workflow_call:
+    inputs:
+      build_type:
+        required: true
+        type: string
+
   workflow_dispatch:
   pull_request:
 
@@ -268,9 +274,9 @@ jobs:
           v=$(git rev-parse --short HEAD)
           echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
 
-      - name: Upload runtime artifact
+      - name: Upload CI artifact
+        if: inputs.build_type == 'ci'
         uses: actions/upload-artifact@v4
         with:
           name: BiodiverseR_macos_arm64_${{ steps.build_version.outputs.BD_VERSION }}
           path: BiodiverseR/inst/perl/BiodiverseR
-

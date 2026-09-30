@@ -1,0 +1,11 @@
+name: macOS CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  macos:
+    uses: ./.github/workflows/macos-runtime.yml
+    with:
+      build_type: ci
