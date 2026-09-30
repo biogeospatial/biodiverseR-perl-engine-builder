@@ -5,7 +5,7 @@ globals:
     branch: "master"
 
   biodiverser:
-    branch: "main"
+    branch: "101-generalise-runtime-startup-and-installation-across-platforms"
 
   runtime:
     test_port: 3001
