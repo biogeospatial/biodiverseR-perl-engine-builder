@@ -99,6 +99,22 @@ jobs:
           cpanm --installdeps --notest Alien::gdal
           cpanm --notest -v Alien::gdal
 
+      - name: GDAL diagnostics
+        run: |
+          brew list | grep -E 'gdal|openexr|imath' || true
+
+          echo "Looking for half.h..."
+          find /opt/homebrew -name half.h 2>/dev/null || true
+
+          echo "Looking for Imath directories..."
+          find /opt/homebrew -name Imath 2>/dev/null || true
+
+          echo "GDAL version"
+          gdalinfo --version
+
+          echo "GDAL config"
+          gdal-config --version || true
+
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm Geo::GDAL::FFI
 
