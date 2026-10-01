@@ -13,9 +13,9 @@ jobs:
       - run: echo "Future Windows release build"
 
   build-macos:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Future macOS release build"
+    uses: ./.github/workflows/macos-runtime.yml
+    with:
+      build_type: release
 
   build-linux:
     runs-on: ubuntu-latest

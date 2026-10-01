@@ -1,0 +1,343 @@
+name: macOS Runtime
+
+on:
+  workflow_call:
+    inputs:
+      build_type:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  perl:
+
+    runs-on: macos-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Load runtime configuration
+        run: |
+          echo "PERL_VERSION=$(yq -r '.platforms.macos.perl.version' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "BD_BRANCH=$(yq -r '.globals.biodiverse.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "BDR_BRANCH=$(yq -r '.globals.biodiverser.branch' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "RUNTIME_TEST_PORT=$(yq -r '.globals.runtime.test_port' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "BD_NO_ALIEN_GTKSTACK=$(yq -r '.globals.build.no_alien_gtkstack' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "PKG_CONFIG_PATH=$(yq -r '.platforms.macos.pkg_config_path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+          echo "PATH=$(yq -r '.platforms.macos.path' .github/runtime-config.yml)" >> "$GITHUB_ENV"
+
+      - name: Install system dependencies
+        run: |
+          brew update
+          brew install gsl
+          brew install sqlite
+          brew install gdal
+
+      - name: Check GDAL
+        run: |
+          gdalinfo --version
+          sqlite3
+
+      - name: Cache perlbrew
+        uses: actions/cache@v4
+        with:
+          path: ~/perl5/perlbrew
+          key: perlbrew-${{ env.PERL_VERSION }}-${{ runner.os }}
+
+      - name: Install perlbrew
+        run: |
+          curl -L https://install.perlbrew.pl | bash
+
+      - name: Build Perl
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+
+          if ! perlbrew list | grep -q "perl-${PERL_VERSION}"; then
+            perlbrew install perl-${PERL_VERSION}
+          fi
+
+          perlbrew use perl-${PERL_VERSION}
+
+          perl -V
+
+      - name: Install cpanminus
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          perl -MCPAN -e 'install App::cpanminus'
+
+          cpanm --version
+
+      - name: Install PDL dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          cpanm --notest PDL
+          cpanm -v --notest PDL::GSL::CDF
+
+      - name: Clone Biodiverse
+        run: |
+          git clone --branch $BD_BRANCH --depth=1 \
+            https://github.com/shawnlaffan/biodiverse.git
+
+      - name: FFI diagnostics
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          perl -V
+
+          cpanm --info Alien::FFI || true
+          cpanm --info FFI::Platypus || true
+
+      - name: Install Geo::GDAL::FFI
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          export ALIEN_INSTALL_TYPE=share
+
+          export PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig
+          export CMAKE_PREFIX_PATH=/opt/homebrew
+
+          export CPPFLAGS="-I/opt/homebrew/include"
+          export CFLAGS="-I/opt/homebrew/include"
+          export CXXFLAGS="-I/opt/homebrew/include"
+
+          export ALIEN_GDAL_CMAKE_ARGS="-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_CURL=OFF -DBUILD_APPS=OFF"
+
+          cpanm --installdeps --notest Alien::gdal
+          cpanm --notest -v Alien::gdal
+
+          cpanm --installdeps --notest Geo::GDAL::FFI
+          cpanm Geo::GDAL::FFI
+
+      - name: Upload cpanm work directory
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm-work
+          path: ~/.cpanm/work
+
+      - name: Upload cpanm build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm-log
+          path: ~/.cpanm
+
+      - name: Install Biodiverse dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          cd biodiverse
+          cpanm --installdeps --notest .
+
+      - name: Run Biodiverse tests
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          cd biodiverse
+          prove -j4 -l t
+
+      - name: Clone BiodiverseR
+        run: |
+          git clone --branch $BDR_BRANCH --depth=1 \
+            https://github.com/biogeospatial/BiodiverseR.git
+
+      - name: Install BiodiverseR dependencies
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          cd BiodiverseR/inst/perl
+          cpanm --installdeps --notest .
+
+      - name: Run BiodiverseR tests
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib"
+
+          cd BiodiverseR/inst/perl
+          prove -j4 -l t
+
+      - name: Install PAR::Packer
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          cpanm --notest PAR::Packer
+
+          git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
+
+          cd perl-pp-autolink
+          perl Makefile.PL
+          make
+          make install
+
+#      - name: GDAL diagnostics
+#        run: |
+#          which pkg-config
+#          pkg-config --modversion gdal || true
+#          gdal-config --version || true
+#          perl -MAlien::gdal -e 'print Alien::gdal->dist_dir,"\n"' || true
+         
+#      - name: Inspect Alien GDAL
+#        run: |
+#         source ~/perl5/perlbrew/etc/bashrc
+#         perlbrew use perl-${PERL_VERSION}
+#
+#         GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
+#
+#         echo "Alien::gdal dir: $GDAL_DIR"
+#
+#         find "$GDAL_DIR"
+
+#      - name: Show Alien GDAL contents
+#        run: |
+#         source ~/perl5/perlbrew/etc/bashrc
+#         perlbrew use perl-${PERL_VERSION}
+#
+#        GDAL_DIR=$(perl -MAlien::gdal -e 'print Alien::gdal->dist_dir')
+#
+#         find "$GDAL_DIR"   
+
+      - name: Build BiodiverseR executable
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          export PERL5LIB="${GITHUB_WORKSPACE}/biodiverse/lib:$PERL5LIB"
+
+          which pp_autolink.pl
+
+          cd BiodiverseR/inst/perl
+
+          pp_autolink.pl -x -o BiodiverseR script/BiodiverseR
+
+          ls -lah BiodiverseR
+
+      - name: Test BiodiverseR runtime startup
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          cd BiodiverseR/inst/perl
+
+          chmod +x BiodiverseR
+
+          ./BiodiverseR daemon -l http://127.0.0.1:${RUNTIME_TEST_PORT} > runtime.log 2>&1 &
+          SERVER_PID=$!
+
+          sleep 10
+
+          cat runtime.log
+
+          curl --fail http://127.0.0.1:${RUNTIME_TEST_PORT}/api_key
+
+          kill $SERVER_PID || true
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Test BiodiverseR runtime installation
+        run: |
+          rm -rf ~/Library/Application\ Support/BiodiverseR/runtime || true
+
+          Rscript - <<'RSCRIPT'
+          install.packages("pak", repos = "https://cloud.r-project.org")
+
+          pak::pak(
+            sprintf(
+              "biogeospatial/BiodiverseR@%s",
+              Sys.getenv("BDR_BRANCH")
+            )
+          )
+
+          library(BiodiverseR)
+
+          bd <- BiodiverseR::basedata$new(
+            filename = system.file(
+              "extdata",
+              "example.bds",
+              package = "BiodiverseR"
+            )
+          )
+
+          stopifnot(bd$server_status())
+
+          cat("Runtime installation and startup succeeded\n")
+          RSCRIPT
+
+      - name: Inspect executable
+        run: |
+          uname -m
+          file BiodiverseR/inst/perl/BiodiverseR
+
+      - name: Check build output
+        run: |
+          ls -lah BiodiverseR/inst/perl
+
+          echo "Executable details:"
+          file BiodiverseR/inst/perl/BiodiverseR || true
+
+          echo "Contents:"
+          find BiodiverseR/inst/perl -maxdepth 1 -type f
+
+      - name: Get build version as SHA of BiodiverseR repo
+        id: build_version
+        run: |
+          cd BiodiverseR
+          v=$(git rev-parse --short HEAD)
+          echo "BD_VERSION=${v}" >> "$GITHUB_OUTPUT"
+
+      - name: Get release version
+        if: inputs.build_type == 'release'
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
+      - name: Package release artifact
+        if: inputs.build_type == 'release'
+        run: |
+          cd BiodiverseR/inst/perl
+
+          zip \
+            BiodiverseR_macos_arm64_${VERSION}.zip \
+            BiodiverseR
+
+      - name: Upload release artifact
+        if: inputs.build_type == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: BiodiverseR_macos_arm64_${{ env.VERSION }}
+          path: BiodiverseR/inst/perl/BiodiverseR_macos_arm64_${{ env.VERSION }}.zip
+
+      - name: Upload release asset
+        if: inputs.build_type == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            BiodiverseR/inst/perl/BiodiverseR_macos_arm64_${{ env.VERSION }}.zip
+
+
+      - name: Upload CI artifact
+        if: ${{ inputs.build_type != 'release' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: BiodiverseR_macos_arm64_${{ steps.build_version.outputs.BD_VERSION }}
+          path: BiodiverseR/inst/perl/BiodiverseR

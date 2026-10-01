@@ -35,8 +35,18 @@ Example:
   "current": "v0.1.0-alpha",
   "releases": {
     "v0.1.0-alpha": {
-      "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_win_aaf20ba.zip",
-      "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
+      "windows": {
+        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_windows_aaf20ba.zip",
+        "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
+      },
+      "macos": {
+        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_macos_aaf20ba.tar.gz",
+        "sha256": "d8e1f4f651d7a9b8f0b3d3de3d4f2e7d5b1e8f9a8c7d6e5f4a3b2c1d0e9f8a7b"
+      },
+      "linux": {
+        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_linux_aaf20ba.tar.gz",
+        "sha256": "e7f6d5c4b3a291807f6e5d4c3b2a1908e7d6c5b4a39281706f5e4d3c2b1a0987"
+      }
     }
   }
 }
@@ -62,7 +72,9 @@ A collection of available runtime versions and their associated metadata.
 {
   "releases": {
     "v0.1.0-alpha": {
-      ...
+      "windows": { ... },
+      "macos": { ... },
+      "linux": { ... }
     }
   }
 }
@@ -74,7 +86,7 @@ The download location of the release package.
 
 ```json
 {
-  "url": "https://github.com/.../BiodiverseR_win_aaf20ba.zip"
+  "url": "https://github.com/.../BiodiverseR_windows_aaf20ba.zip"
 }
 ```
 
@@ -85,6 +97,19 @@ The SHA-256 checksum used to verify package integrity before installation.
 ```json
 {
   "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
+}
+```
+
+### `windows`, `macos`, `linux`
+
+Platform-specific runtime metadata. BiodiverseR selects the entry that matches the current operating system and uses the associated package information for installation.
+
+```json
+{
+  "windows": {
+    "url": "...",
+    "sha256": "..."
+  }
 }
 ```
 
