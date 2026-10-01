@@ -18,13 +18,12 @@ downloaded automatically by BiodiverseR when required.
 
 ## Repository Relationships
 
-The runtime ecosystem consists of three primary repositories:
+The runtime ecosystem currently consists of four primary repositories:
 
 ```text
 Biodiverse
-    ↓
 BiodiverseR
-    ↓
+biodiverse-sp-portable
 biodiverseR-perl-engine-builder
 ```
 
@@ -36,23 +35,16 @@ Provides the underlying biodiversity analysis functionality.
 
 Provides the R interface used by end users.
 
-BiodiverseR communicates with a local Biodiverse runtime through an
-HTTP API and exposes Biodiverse functionality as R objects and methods.
+### biodiverse-sp-portable
 
-BiodiverseR is responsible for:
-
-- Detecting runtime availability.
-- Downloading runtimes.
-- Verifying runtime integrity.
-- Installing runtimes.
-- Starting runtimes.
-- Communicating with runtimes.
-- Exposing Biodiverse functionality to R users.
+Provides pre-built Strawberry Perl runtime distributions used by the
+Windows runtime build process.
 
 ### biodiverseR-perl-engine-builder
 
-Builds and publishes platform-specific runtime packages used by
+Builds, tests, packages and publishes runtime releases used by
 BiodiverseR.
+```
 
 ## Runtime Lifecycle
 
