@@ -44,7 +44,6 @@ Windows runtime build process.
 
 Builds, tests, packages and publishes runtime releases used by
 BiodiverseR.
-```
 
 ## Runtime Lifecycle
 
@@ -209,47 +208,4 @@ Invokes the reusable macOS workflow for:
 
 ### releases.yml
 
-Triggers on Git tags and invokes runtime build workflows to publish
-release assets.
-
-### linux-test.yml
-
-Provides Linux validation and testing.
-
-## Runtime Validation
-
-Runtime builds are validated using:
-
-### Runtime Startup Test
-
-Verifies that the packaged runtime executable starts successfully.
-
-### Runtime Installation Test
-
-Verifies that BiodiverseR can:
-
-- Download the runtime.
-- Install the runtime.
-- Start the runtime.
-- Create a `basedata` object.
-- Communicate successfully with the runtime.
-
-This provides an end-to-end validation of the user installation path.
-
-## Architecture Decision Records
-
-Important architectural decisions are documented in:
-
-```text
-docs/adr/
-```
-
-These records describe:
-
-- Why decisions were made.
-- Alternatives that were considered.
-- Consequences of those decisions.
-
-ADRs should be consulted when modifying runtime architecture,
-configuration, release processes, or platform support.
-
+Triggers on Git tags and invokes runtime build
