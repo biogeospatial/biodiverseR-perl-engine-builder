@@ -1,51 +1,93 @@
 # BiodiverseR Runtime Releases
 
-This repository hosts runtime packages and release metadata used by BiodiverseR.
+This repository builds, tests, packages and publishes runtime releases
+used by BiodiverseR.
 
-The repository currently distributes Windows runtimes and is designed to support additional platforms in future releases. BiodiverseR uses the release manifest maintained in this repository to discover, download, verify and install the appropriate runtime version for the user's platform.
+The runtime allows BiodiverseR users to access Biodiverse functionality
+from R without requiring a separate Perl or Biodiverse installation.
 
-Most users will never need to interact with this repository directly. Instead, BiodiverseR automatically downloads, verifies, installs and manages the required runtime when needed.
+Most users will never interact with this repository directly. Instead,
+BiodiverseR automatically downloads, verifies, installs and manages the
+appropriate runtime when required.
 
 ## Purpose
 
-BiodiverseR relies on a local server process that provides access to Biodiverse functionality through an HTTP API.
+BiodiverseR communicates with a local runtime process through an HTTP
+API.
 
-To simplify installation, pre-built runtime packages are distributed through this repository. BiodiverseR automatically:
+To simplify installation, pre-built runtime packages are distributed
+through this repository.
 
-1. Checks the release manifest for the latest available runtime version.
-2. Downloads the corresponding release package from GitHub.
-3. Verifies the package using a SHA-256 checksum.
-4. Installs the runtime into a per-version cache location.
-5. Launches the runtime when required.
+When required, BiodiverseR automatically:
 
-This removes the need for end users to install Perl or build Biodiverse from source.
+1. Checks the release manifest for the current runtime version.
+2. Determines the runtime package appropriate for the current platform.
+3. Downloads the runtime package from GitHub Releases.
+4. Verifies the package using a SHA-256 checksum.
+5. Installs the runtime into a version-specific cache location.
+6. Starts the runtime and establishes communication through the local
+   API.
+
+This removes the need for end users to install Perl or build Biodiverse
+from source.
+
+## Supported Platforms
+
+Current runtime support includes:
+
+- Windows
+- macOS ARM64 (Apple Silicon)
+
+Linux runtime support is under development.
+
+## Documentation
+
+Additional documentation is available in:
+
+- `docs/runtime-architecture.md`
+- `docs/release-process.md`
+- `docs/troubleshooting.md`
+- `docs/glossary.md`
+- `docs/dependency-stack.md`
+- `docs/adr/`
 
 ## Runtime Behaviour
 
-The runtime supports multiple concurrent server instances. BiodiverseR typically starts the server on an automatically selected available port, allowing multiple R sessions to run independently on the same machine.
+The runtime supports multiple concurrent server instances.
+
+BiodiverseR typically starts the server on an automatically selected
+available port, allowing multiple R sessions to run independently on
+the same machine.
 
 ## Release Manifest
 
-The repository root contains a JSON manifest describing available runtime releases.
+The repository root contains a JSON manifest describing available
+runtime releases.
+
+File:
+
+```text
+releases.json
+```
 
 Example:
 
 ```json
 {
-  "current": "v0.1.0-alpha",
+  "current": "v0.2.0",
   "releases": {
-    "v0.1.0-alpha": {
+    "v0.2.0": {
       "windows": {
-        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_windows_aaf20ba.zip",
-        "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
+        "url": "...",
+        "sha256": "..."
       },
       "macos": {
-        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_macos_aaf20ba.tar.gz",
-        "sha256": "d8e1f4f651d7a9b8f0b3d3de3d4f2e7d5b1e8f9a8c7d6e5f4a3b2c1d0e9f8a7b"
+        "url": "...",
+        "sha256": "..."
       },
       "linux": {
-        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_linux_aaf20ba.tar.gz",
-        "sha256": "e7f6d5c4b3a291807f6e5d4c3b2a1908e7d6c5b4a39281706f5e4d3c2b1a0987"
+        "url": "...",
+        "sha256": "..."
       }
     }
   }
@@ -56,22 +98,26 @@ Example:
 
 #### `current`
 
-The version BiodiverseR should treat as the default runtime.
+The runtime version BiodiverseR should use by default.
+
+Example:
 
 ```json
 {
-  "current": "v0.1.0-alpha"
+  "current": "v0.2.0"
 }
 ```
 
 #### `releases`
 
-A collection of available runtime versions and their associated metadata.
+A collection of runtime versions and their associated platform metadata.
+
+Example:
 
 ```json
 {
   "releases": {
-    "v0.1.0-alpha": {
+    "v0.2.0": {
       "windows": { ... },
       "macos": { ... },
       "linux": { ... }
@@ -80,121 +126,193 @@ A collection of available runtime versions and their associated metadata.
 }
 ```
 
-#### `url`
+#### Platform Entries
 
-The download location of the release package.
-
-```json
-{
-  "url": "https://github.com/.../BiodiverseR_windows_aaf20ba.zip"
-}
-```
-
-#### `sha256`
-
-The SHA-256 checksum used to verify package integrity before installation.
+Each platform entry contains:
 
 ```json
 {
-  "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
+  "url": "...",
+  "sha256": "..."
 }
 ```
 
-### `windows`, `macos`, `linux`
+where:
 
-Platform-specific runtime metadata. BiodiverseR selects the entry that matches the current operating system and uses the associated package information for installation.
+- `url` is the runtime package download location.
+- `sha256` is the checksum used to verify package integrity.
+
+Current platform identifiers are:
+
+```text
+windows
+macos
+linux
+```
+
+## Manifest Compatibility
+
+The release manifest currently supports both:
+
+### Legacy Format
+
+```json
+{
+  "url": "...",
+  "sha256": "..."
+}
+```
+
+### Platform-Specific Format
 
 ```json
 {
   "windows": {
     "url": "...",
     "sha256": "..."
+  },
+  "macos": {
+    "url": "...",
+    "sha256": "..."
+  },
+  "linux": {
+    "url": "...",
+    "sha256": "..."
   }
 }
 ```
 
-If the downloaded package does not match the published checksum, BiodiverseR will reject the download and abort installation.
+New runtime releases should use platform-specific metadata.
+
+Legacy metadata is retained for compatibility with previously released
+versions of BiodiverseR.
 
 ## Automatic Installation
 
-When BiodiverseR requires a runtime, it performs the following steps:
+When BiodiverseR requires a runtime it performs the following steps:
 
-1. Check whether the required runtime version is already installed locally.
-2. If the runtime is already installed, reuse the cached runtime.
-3. If the runtime is not installed, determine the version specified by the release manifest.
-4. Download the associated release package.
-5. Verify the package checksum.
-6. Extract the runtime into a version-specific cache directory.
-7. Reuse the cached runtime in future sessions.
+1. Check whether the required runtime version is already installed.
+2. Reuse the runtime if it already exists locally.
+3. Download the runtime if required.
+4. Verify the package checksum.
+5. Extract the runtime into a version-specific cache directory.
+6. Start the runtime when needed.
+7. Reuse the installed runtime for future sessions.
 
-To avoid race conditions, BiodiverseR uses an installation lock so that only one R session installs a particular runtime version at a time.
+To avoid race conditions, BiodiverseR uses an installation lock so that
+only one R session installs a particular runtime version at a time.
 
-## Runtime Installation
+## Runtime Installation Locations
 
-BiodiverseR installs runtimes into platform-specific user cache locations.
+Runtimes are installed into platform-specific user cache locations.
 
-The exact location depends on the operating system and BiodiverseR version.
+Examples include:
 
-Current Windows installations use a location similar to:
+### Windows
 
 ```text
-%LOCALAPPDATA%\BiodiverseR\runtime\<version>\
+%LOCALAPPDATA%\BiodiverseR\runtime\\
 ```
 
-For example:
+Example:
 
 ```text
-C:\Users\username\AppData\Local\BiodiverseR\runtime\v0.1.0-alpha\
+C:\Users\username\AppData\Local\BiodiverseR\runtime\v0.2.0\
 ```
 
-If `LOCALAPPDATA` is unavailable, BiodiverseR falls back to:
+### macOS
 
 ```text
-%APPDATA%
+~/Library/Application Support/BiodiverseR/runtime//
 ```
 
 ## Runtime Package Requirements
 
 Each runtime package must:
 
-- Contain the server runtime for the target platform.
+- Contain the Biodiverse runtime executable for the target platform.
 - Include all required runtime dependencies.
-- Be downloadable from the URL listed in the release manifest.
+- Be downloadable from the URL defined in the release manifest.
 - Match the published SHA-256 checksum.
 
-Current Windows releases are distributed as ZIP archives containing the `BiodiverseR.exe` runtime executable.
+Typical runtime package names include:
 
-## Publishing a New Release
+```text
+BiodiverseR_windows_x64_v0.2.0.zip
+BiodiverseR_macos_arm64_v0.2.0.zip
+BiodiverseR_linux_x64_v0.2.0.zip
+```
 
-When publishing a new runtime release:
+## CI Artifacts vs Release Assets
 
-1. Build the runtime package.
-2. Create a GitHub Release.
-3. Upload the package as a release asset.
-4. Calculate the SHA-256 checksum of the package.
-5. Add a new release entry to the manifest.
-6. Update the `current` field if the new release should become the default version.
-7. Commit and push the updated manifest.
+### CI Artifacts
 
-### Release Automation
+Generated during development and CI validation.
 
-Runtime packages are built and validated using GitHub Actions workflows for supported platforms.
+Examples:
 
-Releases are intended to be published from version tags, allowing platform-specific runtime packages, release metadata and checksums to be generated and published in a consistent manner.
+```text
+BiodiverseR_win_d2ddf75
+BiodiverseR_macos_arm64_d2ddf75
+```
 
-The release manifest (`releases.json`) acts as the authoritative source of runtime version information used by BiodiverseR.
+CI artifacts are identified using the source commit SHA and are intended
+for testing and traceability.
+
+### Release Assets
+
+Generated from version tags.
+
+Examples:
+
+```text
+BiodiverseR_windows_x64_v0.2.0.zip
+BiodiverseR_macos_arm64_v0.2.0.zip
+```
+
+Release assets are intended for distribution and installation by
+BiodiverseR users.
+
+## Release Workflow
+
+Runtime releases are created from Git tags.
+
+Example:
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+The automated release workflow:
+
+1. Builds the runtime.
+2. Runs validation tests.
+3. Packages the runtime archive.
+4. Creates or updates the GitHub Release.
+5. Uploads runtime release assets.
+
+See:
+
+```text
+docs/release-process.md
+```
+
+for detailed release instructions.
 
 ## Relationship to BiodiverseR
 
-This repository serves as the distribution point for BiodiverseR runtimes.
+This repository serves as the distribution point for BiodiverseR
+runtimes.
 
 BiodiverseR uses the release manifest as the authoritative source for:
 
 - The current runtime version.
-- Download locations for runtime packages.
-- Package integrity verification using SHA-256 checksums.
+- Runtime package download locations.
+- Runtime package checksum verification.
 
-The runtime is downloaded and managed automatically by BiodiverseR and normally requires no user intervention.
+Runtime installation and management are normally performed
+automatically by BiodiverseR and require no user intervention.
 
 ## License
 
