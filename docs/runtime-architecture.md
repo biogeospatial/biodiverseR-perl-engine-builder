@@ -50,7 +50,7 @@ BiodiverseR.
 
 The high-level runtime lifecycle is:
 
-```
+```text
 Git Tag
     ↓
 Release Workflow
