@@ -91,6 +91,16 @@ jobs:
           git clone --branch $BD_BRANCH --depth=1 \
             https://github.com/shawnlaffan/biodiverse.git
 
+      - name: FFI diagnostics
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perlbrew use perl-${PERL_VERSION}
+
+          perl -V
+
+          cpanm --info Alien::FFI || true
+          cpanm --info FFI::Platypus || true
+
       - name: Install Geo::GDAL::FFI
         run: |
           source ~/perl5/perlbrew/etc/bashrc
@@ -112,6 +122,20 @@ jobs:
 
           cpanm --installdeps --notest Geo::GDAL::FFI
           cpanm Geo::GDAL::FFI
+
+      - name: Upload cpanm work directory
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm-work
+          path: ~/.cpanm/work
+
+      - name: Upload cpanm build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpanm-log
+          path: ~/.cpanm
 
       - name: Install Biodiverse dependencies
         run: |
