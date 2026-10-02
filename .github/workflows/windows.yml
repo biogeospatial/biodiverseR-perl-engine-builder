@@ -17,12 +17,9 @@ env:
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_CPANM_HOME: /Users/runner/_cpanm
-  BD_BRANCH: master
-  SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
   SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
   CMAKE_BUILD_PARALLEL_LEVEL: 4
-  BD_NO_ALIEN_GTKSTACK: 1
 
 jobs:
   perl:
@@ -45,8 +42,6 @@ jobs:
           "BDR_BRANCH=$(yq -r '.globals.biodiverser.branch' .github/runtime-config.yml)" >> $env:GITHUB_ENV
 
           "BD_NO_ALIEN_GTKSTACK=$(yq -r '.globals.build.no_alien_gtkstack' .github/runtime-config.yml)" >> $env:GITHUB_ENV
-
-          "SP_VERSION=$(yq -r '.platforms.windows.perl.version' .github/runtime-config.yml)" >> $env:GITHUB_ENV
 
           "SP_URL=$(yq -r '.platforms.windows.strawberry_perl.url' .github/runtime-config.yml)" >> $env:GITHUB_ENV
 
@@ -165,7 +160,6 @@ jobs:
         run: |
           perl -E'say $^V'
           git clone --branch $env:BD_BRANCH --depth=1 https://github.com/shawnlaffan/biodiverse.git
-          #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
           #prove t/00-load.t
@@ -180,8 +174,7 @@ jobs:
         shell: pwsh
         run: |
           perl -E'say $^V'
-          #git clone --branch $env:BD_BRANCH --depth=1 https://github.com/biogeospatial/BiodiverseR.git
-          git clone --branch main --depth=1 https://github.com/biogeospatial/BiodiverseR.git
+          git clone --branch $env:BDR_BRANCH --depth=1 https://github.com/biogeospatial/BiodiverseR.git
           cd BiodiverseR/inst/perl
           cpanm --installdeps .
           $env:PERL5LIB = "$env:PERL5LIB;$env:GITHUB_WORKSPACE/biodiverse/lib"
