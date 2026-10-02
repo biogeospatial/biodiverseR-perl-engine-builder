@@ -4,15 +4,6 @@ on:
   workflow_dispatch:
 
   push:
-    branches:
-      - main
-    tags-ignore:
-      - '*'
-
-  pull_request:
-
-on:
-  push:
     #paths:
     #  - "build_trigger.txt"
     branches:
