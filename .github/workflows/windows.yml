@@ -36,6 +36,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Install workflow tools
+        shell: pwsh
+        run: |
+          choco install yq -y
+
       - name: Load runtime configuration
         shell: pwsh
         run: |
