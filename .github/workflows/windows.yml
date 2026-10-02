@@ -52,7 +52,7 @@ jobs:
 
       - name: Install Strawberry perl
         run: |
-          Invoke-WebRequest -Uri "https://github.com/biogeospatial/biodiverse-sp-portable/releases/download/5.42.2.1-20260513/bd-sp-perl-5.38.4.1-64bit-PDL-20260513.zip" -OutFile ".\sp.zip" 
+          Invoke-WebRequest -Uri "$env:SP_URL" -OutFile ".\sp.zip"
           Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
           ls "$env:ST"
           "PATH=$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin;$env:PATH" >> $env:GITHUB_ENV
