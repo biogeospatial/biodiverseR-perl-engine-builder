@@ -37,6 +37,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Load runtime configuration
+        shell: pwsh
+        run: |
+          "BD_BRANCH=$(yq -r '.globals.biodiverse.branch' .github/runtime-config.yml)" >> $env:GITHUB_ENV
+
+          "BDR_BRANCH=$(yq -r '.globals.biodiverser.branch' .github/runtime-config.yml)" >> $env:GITHUB_ENV
+
+          "BD_NO_ALIEN_GTKSTACK=$(yq -r '.globals.build.no_alien_gtkstack' .github/runtime-config.yml)" >> $env:GITHUB_ENV
+
+          "SP_VERSION=$(yq -r '.platforms.windows.perl.version' .github/runtime-config.yml)" >> $env:GITHUB_ENV
+
+          "SP_URL=$(yq -r '.platforms.windows.strawberry_perl.url' .github/runtime-config.yml)" >> $env:GITHUB_ENV
+
       - name: Install Strawberry perl
         run: |
           Invoke-WebRequest -Uri "https://github.com/biogeospatial/biodiverse-sp-portable/releases/download/5.42.2.1-20260513/bd-sp-perl-5.38.4.1-64bit-PDL-20260513.zip" -OutFile ".\sp.zip" 
