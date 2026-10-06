@@ -225,8 +225,6 @@ jobs:
 
           Test-Path "$env:GITHUB_WORKSPACE\BiodiverseR.exe"
 
-          Get-Item "$env:GITHUB_WORKSPACE\BiodiverseR.exe"
-
           $proc = Start-Process `
             -FilePath "$env:GITHUB_WORKSPACE\BiodiverseR.exe" `
             -ArgumentList "daemon","-l",$runtime_url `
@@ -234,29 +232,7 @@ jobs:
             -RedirectStandardError runtime.err.log `
             -PassThru
 
-          Write-Host "PID: $($proc.Id)"
-
           Start-Sleep -Seconds 10
-
-          Get-CimInstance Win32_Process |
-            Where-Object { $_.Name -eq "BiodiverseR.exe" } |
-            Format-List ProcessId, ParentProcessId, CommandLine
-
-          Get-CimInstance Win32_Process |
-            Where-Object { $_.Name -eq "BiodiverseR.exe" } |
-            Select-Object ProcessId
-
-          Write-Host "HasExited: $($proc.HasExited)"
-
-          if ($proc.HasExited) {
-            Write-Host "ExitCode: $($proc.ExitCode)"
-          }
-
-          Get-Process | Where-Object {
-            $_.ProcessName -match "Biodiverse"
-          }
-
-          netstat -ano | findstr 3001
 
           Get-Content runtime.out.log -ErrorAction SilentlyContinue
           Get-Content runtime.err.log -ErrorAction SilentlyContinue
@@ -265,34 +241,6 @@ jobs:
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
             Stop-Process -Force
-
-          Start-Sleep -Seconds 10
-
-          Get-Content runtime.out.log -ErrorAction SilentlyContinue
-          Get-Content runtime.err.log -ErrorAction SilentlyContinue
-
-          Write-Host "==== LOG FILES ===="
-
-          Get-Item runtime.out.log -ErrorAction SilentlyContinue
-          Get-Item runtime.err.log -ErrorAction SilentlyContinue
-
-          Write-Host "==== STDOUT ===="
-
-          Get-Content runtime.out.log -ErrorAction SilentlyContinue
-
-          Write-Host "==== STDERR ===="
-
-          Get-Content runtime.err.log -ErrorAction SilentlyContinue
-
-          Write-Host "==== PORTS ===="
-
-          netstat -ano | findstr 3001
-
-          curl.exe --fail "$runtime_url/api_key"
-
-          Get-Process BiodiverseR -ErrorAction SilentlyContinue |
-            Stop-Process -Force
-
 
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
