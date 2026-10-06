@@ -232,11 +232,34 @@ jobs:
 
           Get-Item "$env:GITHUB_WORKSPACE\BiodiverseR.exe"
 
-          Start-Process `
+          $proc = Start-Process `
             -FilePath "$env:GITHUB_WORKSPACE\BiodiverseR.exe" `
             -ArgumentList "daemon","-l",$runtime_url `
             -RedirectStandardOutput runtime.out.log `
-            -RedirectStandardError runtime.err.log
+            -RedirectStandardError runtime.err.log `
+            -PassThru
+
+          Write-Host "PID: $($proc.Id)"
+
+          Start-Sleep -Seconds 10
+
+          Write-Host "HasExited: $($proc.HasExited)"
+
+          if ($proc.HasExited) {
+            Write-Host "ExitCode: $($proc.ExitCode)"
+          }
+
+          Get-Process | Where-Object {
+            $_.ProcessName -match "Biodiverse"
+          }
+
+          Get-Content runtime.out.log -ErrorAction SilentlyContinue
+          Get-Content runtime.err.log -ErrorAction SilentlyContinue
+
+          curl.exe --fail "$runtime_url/api_key"
+
+          Get-Process BiodiverseR -ErrorAction SilentlyContinue |
+            Stop-Process -Force
 
           Start-Sleep -Seconds 10
 
