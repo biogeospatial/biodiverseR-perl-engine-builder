@@ -223,13 +223,12 @@ jobs:
       - name: Test BiodiverseR runtime startup
         shell: pwsh
         run: |
+          $runtime_url = "http://127.0.0.1:$($env:RUNTIME_TEST_PORT)"
+          Write-Host "Runtime URL: $runtime_url"
 
-      - name: Test BiodiverseR runtime startup
-        shell: pwsh
-        run: |
           Start-Process `
             -FilePath "$env:GITHUB_WORKSPACE\BiodiverseR.exe" `
-            -ArgumentList "daemon","-l","http://127.0.0.1:$env:RUNTIME_TEST_PORT" `
+            -ArgumentList "daemon","-l",$runtime_url `
             -RedirectStandardOutput runtime.out.log `
             -RedirectStandardError runtime.err.log
 
@@ -238,17 +237,11 @@ jobs:
           Get-Content runtime.out.log -ErrorAction SilentlyContinue
           Get-Content runtime.err.log -ErrorAction SilentlyContinue
 
-          curl.exe --fail `
-            "http://127.0.0.1:$env:RUNTIME_TEST_PORT/api_key"
+          curl.exe --fail "$runtime_url/api_key"
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
             Stop-Process -Force
 
-          curl.exe --fail `
-            "http://127.0.0.1:$env:RUNTIME_TEST_PORT/api_key"
-
-          Get-Process BiodiverseR -ErrorAction SilentlyContinue |
-            Stop-Process -Force
 
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
