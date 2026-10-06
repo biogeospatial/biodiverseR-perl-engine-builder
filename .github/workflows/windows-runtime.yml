@@ -221,6 +221,10 @@ jobs:
           $runtime_url = "http://127.0.0.1:$($env:RUNTIME_TEST_PORT)"
           Write-Host "Runtime URL: $runtime_url"
 
+          Test-Path "$env:GITHUB_WORKSPACE\BiodiverseR.exe"
+
+          Get-Item "$env:GITHUB_WORKSPACE
+
           Start-Process `
             -FilePath "$env:GITHUB_WORKSPACE\BiodiverseR.exe" `
             -ArgumentList "daemon","-l",$runtime_url `
