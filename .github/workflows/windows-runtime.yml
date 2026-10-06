@@ -218,15 +218,26 @@ jobs:
       - name: Test BiodiverseR runtime startup
         shell: pwsh
         run: |
+
+      - name: Test BiodiverseR runtime startup
+        shell: pwsh
+        run: |
           Start-Process `
             -FilePath "$env:GITHUB_WORKSPACE\BiodiverseR.exe" `
             -ArgumentList "daemon","-l","http://127.0.0.1:$env:RUNTIME_TEST_PORT" `
-            -RedirectStandardOutput runtime.log `
-            -RedirectStandardError runtime.log
+            -RedirectStandardOutput runtime.out.log `
+            -RedirectStandardError runtime.err.log
 
           Start-Sleep -Seconds 10
 
-          Get-Content runtime.log -ErrorAction SilentlyContinue
+          Get-Content runtime.out.log -ErrorAction SilentlyContinue
+          Get-Content runtime.err.log -ErrorAction SilentlyContinue
+
+          curl.exe --fail `
+            "http://127.0.0.1:$env:RUNTIME_TEST_PORT/api_key"
+
+          Get-Process BiodiverseR -ErrorAction SilentlyContinue |
+            Stop-Process -Force
 
           curl.exe --fail `
             "http://127.0.0.1:$env:RUNTIME_TEST_PORT/api_key"
