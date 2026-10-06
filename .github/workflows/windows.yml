@@ -245,6 +245,10 @@ jobs:
 
           Get-CimInstance Win32_Process |
             Where-Object { $_.Name -eq "BiodiverseR.exe" } |
+            Format-List ProcessId, ParentProcessId, CommandLine
+
+          Get-CimInstance Win32_Process |
+            Where-Object { $_.Name -eq "BiodiverseR.exe" } |
             Select-Object ProcessId
 
           Write-Host "HasExited: $($proc.HasExited)"
