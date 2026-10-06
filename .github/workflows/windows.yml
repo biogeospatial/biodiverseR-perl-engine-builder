@@ -253,6 +253,8 @@ jobs:
             $_.ProcessName -match "Biodiverse"
           }
 
+          netstat -ano | findstr 3001
+
           Get-Content runtime.out.log -ErrorAction SilentlyContinue
           Get-Content runtime.err.log -ErrorAction SilentlyContinue
 
