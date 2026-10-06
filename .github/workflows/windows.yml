@@ -268,6 +268,23 @@ jobs:
           Get-Content runtime.out.log -ErrorAction SilentlyContinue
           Get-Content runtime.err.log -ErrorAction SilentlyContinue
 
+          Write-Host "==== LOG FILES ===="
+
+          Get-Item runtime.out.log -ErrorAction SilentlyContinue
+          Get-Item runtime.err.log -ErrorAction SilentlyContinue
+
+          Write-Host "==== STDOUT ===="
+
+          Get-Content runtime.out.log -ErrorAction SilentlyContinue
+
+          Write-Host "==== STDERR ===="
+
+          Get-Content runtime.err.log -ErrorAction SilentlyContinue
+
+          Write-Host "==== PORTS ===="
+
+          netstat -ano | findstr 3001
+
           curl.exe --fail "$runtime_url/api_key"
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
