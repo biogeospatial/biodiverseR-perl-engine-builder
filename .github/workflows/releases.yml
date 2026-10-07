@@ -8,9 +8,9 @@ on:
 jobs:
 
   build-windows:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Future Windows release build"
+    uses: ./.github/workflows/windows-runtime.yml
+    with:
+      build_type: release
 
   build-macos:
     uses: ./.github/workflows/macos-runtime.yml
