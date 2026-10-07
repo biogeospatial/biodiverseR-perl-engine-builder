@@ -5,7 +5,8 @@ on:
     inputs:
       build_type:
         required: true
-        type
+        type: string
+
 env:
   PERL5LIB: /Users/runner/perl5/lib/perl5
   PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
