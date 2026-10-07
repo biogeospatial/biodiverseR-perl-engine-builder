@@ -48,7 +48,7 @@ jobs:
           sqlite3
 
       - name: Cache perlbrew
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/perl5/perlbrew
           key: perlbrew-${{ env.PERL_VERSION }}-${{ runner.os }}
