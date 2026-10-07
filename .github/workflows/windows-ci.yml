@@ -1,4 +1,4 @@
-iname: Windows CI
+name: Windows CI
 
 on:
   workflow_dispatch:
