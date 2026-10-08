@@ -243,20 +243,19 @@ jobs:
           $success = $false
 
           for ($i = 0; $i -lt 30; $i++) {
-              try {
-                  curl.exe --fail "$runtime_url/api_key"
-                  $success = $true
-                  break
-              }
-              catch {
-                  Start-Sleep -Seconds 1
-              }
+            try {
+              curl.exe --fail "$runtime_url/api_key"
+              $success = $true
+              break
+            }
+            catch {
+              Start-Sleep -Seconds 1
+            }
           }
 
-         if (-not $success) {
-              throw "Runtime did not start listening within 30 seconds."
+          if (-not $success) {
+            throw "Runtime did not start listening within 30 seconds."
           }
-
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
             Stop-Process -Force
