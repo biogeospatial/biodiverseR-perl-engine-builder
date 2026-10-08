@@ -240,32 +240,23 @@ jobs:
             -RedirectStandardError runtime.err.log `
             -PassThru
 
-          for ($i = 0; $i -lt 60; $i++) {
-              Write-Host "Check $i"
+          $success = $false
 
-              netstat -ano | findstr 3001
-
-              Start-Sleep -Seconds 1
+          for ($i = 0; $i -lt 30; $i++) {
+              try {
+                  curl.exe --fail "$runtime_url/api_key"
+                  $success = $true
+                  break
+              }
+              catch {
+                  Start-Sleep -Seconds 1
+              }
           }
 
-          Write-Host "--- Process check ---"
-          Get-Process BiodiverseR -ErrorAction SilentlyContinue
+         if (-not $success) {
+              throw "Runtime did not start listening within 30 seconds."
+          }
 
-          Write-Host "--- Port check ---"
-          netstat -ano | findstr 3001
-
-          Get-CimInstance Win32_Process |
-            Where-Object { $_.Name -eq "BiodiverseR.exe" } |
-            Select-Object ProcessId, CommandLine
-
-          Write-Host "--- Listening ports ---"
-          netstat -ano | findstr LISTENING
-
-          Write-Host "--- BiodiverseR process IDs ---"
-          Get-Process BiodiverseR -ErrorAction SilentlyContinue |
-              Select-Object Id, ProcessName
-
-          curl.exe --fail "$runtime_url/api_key"
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
             Stop-Process -Force
