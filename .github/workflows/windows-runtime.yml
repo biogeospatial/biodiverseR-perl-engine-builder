@@ -243,8 +243,15 @@ jobs:
           $success = $false
 
           for ($i = 0; $i -lt 30; $i++) {
+
+            Write-Host "Retry $i"
+
             try {
-              curl.exe --fail "$runtime_url/api_key"
+              Invoke-WebRequest `
+                -Uri "$runtime_url/api_key" `
+                -UseBasicParsing `
+                -ErrorAction Stop | Out-Null
+
               $success = $true
               break
             }
