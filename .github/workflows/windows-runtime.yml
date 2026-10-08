@@ -337,11 +337,11 @@ jobs:
           path: BiodiverseR_win_x64_${{ env.VERSION }}.zip
 
       - name: Upload release asset
-        if: inputs.build_type == 'release'
+        if: false
         uses: softprops/action-gh-release@v3
         with:
           files: |
-            BiodiverseR_win_x64_${{ env.VERSION }}.zip
+           BiodiverseR_win_x64_${{ env.VERSION }}.zip
 
       - name: Upload CI artifact
         if: ${{ inputs.build_type != 'release' }}
