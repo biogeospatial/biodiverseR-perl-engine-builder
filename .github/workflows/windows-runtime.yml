@@ -251,7 +251,7 @@ jobs:
 
       - name: Upload release asset
         if: inputs.build_type == 'release'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             BiodiverseR_win_x64_${{ env.VERSION }}.zip
