@@ -21,3 +21,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Future Linux release build"
+
+  update-releases-json:
+    needs:
+      - build-windows
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "${{ needs.build-windows.outputs.windows_filename }}"
+          echo "${{ needs.build-windows.outputs.windows_sha256 }}"
+

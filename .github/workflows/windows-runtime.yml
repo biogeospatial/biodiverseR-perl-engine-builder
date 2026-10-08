@@ -6,6 +6,11 @@ on:
       build_type:
         required: true
         type: string
+    outputs:
+      windows_filename:
+        value: ${{ jobs.perl.outputs.windows_filename }}
+      windows_sha256:
+        value: ${{ jobs.perl.outputs.windows_sha256 }}
 
 env:
   PERL5LIB: /Users/runner/perl5/lib/perl5
@@ -20,6 +25,9 @@ env:
 
 jobs:
   perl:
+    outputs:
+      windows_filename: ${{ steps.metadata.outputs.filename }}
+      windows_sha256: ${{ steps.metadata.outputs.sha256 }}
 
     runs-on: windows-latest
     
@@ -310,6 +318,16 @@ jobs:
           Compress-Archive `
             -Path BiodiverseR.exe `
             -DestinationPath BiodiverseR_win_x64_${env:VERSION}.zip
+
+      - name: Generate release metadata
+        if: inputs.build_type == 'release'
+        id: metadata
+        shell: bash
+        run: |
+          SHA=$(sha256sum BiodiverseR_win_x64_${VERSION}.zip | cut -d' ' -f1)
+
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+          echo "filename=BiodiverseR_win_x64_${VERSION}.zip" >> "$GITHUB_OUTPUT"
 
       - name: Upload release artifact
         if: inputs.build_type == 'release'
