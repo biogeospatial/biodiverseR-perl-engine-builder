@@ -252,6 +252,13 @@ jobs:
             Where-Object { $_.Name -eq "BiodiverseR.exe" } |
             Select-Object ProcessId, CommandLine
 
+          Write-Host "--- Listening ports ---"
+          netstat -ano | findstr LISTENING
+
+          Write-Host "--- BiodiverseR process IDs ---"
+          Get-Process BiodiverseR -ErrorAction SilentlyContinue |
+              Select-Object Id, ProcessName
+
           curl.exe --fail "$runtime_url/api_key"
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
