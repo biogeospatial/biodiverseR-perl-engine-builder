@@ -248,6 +248,9 @@ jobs:
           Write-Host "--- Port check ---"
           netstat -ano | findstr 3001
 
+          Get-CimInstance Win32_Process |
+            Where-Object { $_.Name -eq "BiodiverseR.exe" } |
+            Select-Object ProcessId, CommandLine
 
           curl.exe --fail "$runtime_url/api_key"
 
