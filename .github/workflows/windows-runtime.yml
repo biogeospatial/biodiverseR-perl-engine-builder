@@ -242,8 +242,12 @@ jobs:
 
           Start-Sleep -Seconds 10
 
-          Get-Content runtime.out.log -ErrorAction SilentlyContinue
-          Get-Content runtime.err.log -ErrorAction SilentlyContinue
+          Write-Host "--- Process check ---"
+          Get-Process BiodiverseR -ErrorAction SilentlyContinue
+
+          Write-Host "--- Port check ---"
+          netstat -ano | findstr 3001
+
 
           curl.exe --fail "$runtime_url/api_key"
 
