@@ -240,7 +240,13 @@ jobs:
             -RedirectStandardError runtime.err.log `
             -PassThru
 
-          Start-Sleep -Seconds 10
+          for ($i = 0; $i -lt 60; $i++) {
+              Write-Host "Check $i"
+
+              netstat -ano | findstr 3001
+
+              Start-Sleep -Seconds 1
+          }
 
           Write-Host "--- Process check ---"
           Get-Process BiodiverseR -ErrorAction SilentlyContinue
