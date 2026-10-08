@@ -1,0 +1,11 @@
+name: Windows CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  windows:
+    uses: ./.github/workflows/windows-runtime.yml
+    with:
+      build_type: ci

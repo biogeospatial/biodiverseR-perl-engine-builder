@@ -1,16 +1,11 @@
-name: windows
+name: Windows Runtime
 
 on:
-  workflow_dispatch:
-
-  push:
-    #paths:
-    #  - "build_trigger.txt"
-    branches:
-      - main
-    tags-ignore:
-      - '*'
-  pull_request:
+  workflow_call:
+    inputs:
+      build_type:
+        required: true
+        type: string
 
 env:
   PERL5LIB: /Users/runner/perl5/lib/perl5
@@ -233,11 +228,38 @@ jobs:
           predicate-type: 'https://slsa.dev/provenance/v0.2'
           predicate: '{}'
         
-      - name: Upload artefact
+      - name: Get release version
+        if: inputs.build_type == 'release'
+        shell: bash
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
+      - name: Package release artifact
+        if: inputs.build_type == 'release'
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path BiodiverseR.exe `
+            -DestinationPath BiodiverseR_win_x64_${env:VERSION}.zip
+
+      - name: Upload release artifact
+        if: inputs.build_type == 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: BiodiverseR_win_x64_${{ env.VERSION }}
+          path: BiodiverseR_win_x64_${{ env.VERSION }}.zip
+
+      - name: Upload release asset
+        if: inputs.build_type == 'release'
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            BiodiverseR_win_x64_${{ env.VERSION }}.zip
+
+      - name: Upload CI artifact
+        if: ${{ inputs.build_type != 'release' }}
         uses: actions/upload-artifact@v7
         with:
           name: BiodiverseR_win_${{ steps.build_version.outputs.BD_VERSION }}
           path: |
-            ./Biodiverse*.exe
-
-
+            ./Biodiverse*.exe 
