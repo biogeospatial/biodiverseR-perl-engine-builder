@@ -39,11 +39,16 @@ jobs:
           echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
 
       - name: Update releases.json
+        env:
+          WINDOWS_FILENAME: ${{ needs.build-windows.outputs.windows_filename }}
+          WINDOWS_SHA256: ${{ needs.build-windows.outputs.windows_sha256 }}
         run: |
+          WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
+
           python scripts/update_releases_json.py \
             "$VERSION" \
-            "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/${{ needs.build-windows.outputs.windows_filename }}" \
-            "${{ needs.build-windows.outputs.windows_sha256 }}" \
+            "$WINDOWS_URL" \
+            "$WINDOWS_SHA256" \
             "" \
             "" \
             "" \
