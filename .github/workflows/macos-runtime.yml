@@ -6,12 +6,20 @@ on:
       build_type:
         required: true
         type: string
+    outputs:
+      macos_filename:
+        value: ${{ jobs.perl.outputs.macos_filename }}
+      macos_sha256:
+        value: ${{ jobs.perl.outputs.macos_sha256 }}
 
 permissions:
   contents: write
 
 jobs:
   perl:
+    outputs:
+      macos_filename: ${{ steps.metadata.outputs.filename }}
+      macos_sha256: ${{ steps.metadata.outputs.sha256 }}
 
     runs-on: macos-latest
 
@@ -319,6 +327,15 @@ jobs:
           zip \
             BiodiverseR_macos_arm64_${VERSION}.zip \
             BiodiverseR
+
+      - name: Generate release metadata
+        if: inputs.build_type == 'release'
+        id: metadata
+        run: |
+          SHA=$(shasum -a 256 BiodiverseR/inst/perl/BiodiverseR_macos_arm64_${VERSION}.zip | awk '{print $1}')
+
+          echo "filename=BiodiverseR_macos_arm64_${VERSION}.zip" >> "$GITHUB_OUTPUT"
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
 
       - name: Upload release artifact
         if: inputs.build_type == 'release'
