@@ -29,7 +29,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: |
-          echo "${{ needs.build-windows.outputs.windows_filename }}"
-          echo "${{ needs.build-windows.outputs.windows_sha256 }}"
+      - uses: actions/checkout@v7
 
+      - name: Set release version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
+
+      - name: Update releases.json
+        run: |
+          python scripts/update_releases_json.py \
+            "$VERSION" \
+            "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/${{ needs.build-windows.outputs.windows_filename }}" \
+            "${{ needs.build-windows.outputs.windows_sha256 }}" \
+            "" \
+            "" \
+            "" \
+            ""
+
+      - name: Show diff
+        run: |
+          git diff releases.json
