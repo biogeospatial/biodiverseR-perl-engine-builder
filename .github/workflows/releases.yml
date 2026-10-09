@@ -35,14 +35,26 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Update releases.json
-        env:
-          VERSION: ${{ github.ref_name }}
-          WINDOWS_FILENAME: ${{ needs.build-windows.outputs.windows_filename }}
-          WINDOWS_SHA256: ${{ needs.build-windows.outputs.windows_sha256 }}
         run: |
-          WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
+          echo "${{ needs.build-windows.outputs.windows_filename }}"
+          echo "${{ needs.build-windows.outputs.windows_sha256 }}"
 
-          python scripts/update_releases_json.py "$VERSION" "$WINDOWS_URL" "$WINDOWS_SHA256" "" "" "" ""
+#      - name: Update releases.json
+#        run: |
+#          VERSION="${{ github.ref_name }}"
+#          WINDOWS_FILENAME="${{ needs.build-windows.outputs.windows_filename }}"
+#          WINDOWS_SHA256="${{ needs.build-windows.outputs.windows_sha256 }}"
+
+#          WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
+
+#          python scripts/update_releases_json.py \
+#            "$VERSION" \
+#            "$WINDOWS_URL" \
+#            "$WINDOWS_SHA256" \
+#            "" \
+#            "" \
+#            "" \
+#            ""
 
       - name: Commit releases.json
         run: |
