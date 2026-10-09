@@ -28,12 +28,19 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
+      - uses: actions/checkout@v7
+
       - run: |
           VERSION="${{ github.ref_name }}"
           WINDOWS_FILENAME="${{ needs.build-windows.outputs.windows_filename }}"
           WINDOWS_SHA256="${{ needs.build-windows.outputs.windows_sha256 }}"
 
+          WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
+
           echo "$VERSION"
-          echo "$WINDOWS_FILENAME"
+          echo "$WINDOWS_URL"
           echo "$WINDOWS_SHA256"
