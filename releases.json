@@ -4,17 +4,30 @@
     "v0.1.0-alpha": {
       "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_win_aaf20ba.zip",
       "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a",
-
       "windows": {
         "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_win_aaf20ba.zip",
         "sha256": "c4c95ce7f60de5aef0f425579d38b845752db91ff8009c061247a431413ab54a"
       },
-
       "macos": {
         "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-alpha/BiodiverseR_macos_arm64_v0.1.0-alpha.zip",
         "sha256": "adf84f347338b9dfe949b52fd00a2b8cb551975db3e9f4c1d425a73a97318129"
       },
-
+      "linux": {
+        "url": "",
+        "sha256": ""
+      }
+    },
+    "v0.1.0-test32": {
+      "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-test32/BiodiverseR_win_x64_v0.1.0-test32.zip",
+      "sha256": "13974d8a59c1cfbfad3ec03db50cdb2ba4e0d096887ff5621005128db6443508",
+      "windows": {
+        "url": "https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/v0.1.0-test32/BiodiverseR_win_x64_v0.1.0-test32.zip",
+        "sha256": "13974d8a59c1cfbfad3ec03db50cdb2ba4e0d096887ff5621005128db6443508"
+      },
+      "macos": {
+        "url": "",
+        "sha256": ""
+      },
       "linux": {
         "url": "",
         "sha256": ""
