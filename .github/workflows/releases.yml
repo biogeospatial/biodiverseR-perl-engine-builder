@@ -21,3 +21,47 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Future Linux release build"
+
+  update-releases-json:
+    needs:
+      - build-windows
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: |
+          VERSION="${{ github.ref_name }}"
+          WINDOWS_FILENAME="${{ needs.build-windows.outputs.windows_filename }}"
+          WINDOWS_SHA256="${{ needs.build-windows.outputs.windows_sha256 }}"
+
+          MACOS_FILENAME="${{ needs.build-macos.outputs.macos_filename }}"
+          MACOS_SHA256="${{ needs.build-macos.outputs.macos_sha256 }}"
+
+          WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
+
+          MACOS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$MACOS_FILENAME"
+
+          echo "$MACOS_FILENAME"
+          echo "$MACOS_SHA256"
+
+          python scripts/update_releases_json.py "$VERSION" "$WINDOWS_URL" "$WINDOWS_SHA256" "" "" "" ""
+
+
+      - name: Commit releases.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add releases.json
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Add runtime release $VERSION to releases.json"
+            git push origin HEAD:automatic-releases-json
+          fi

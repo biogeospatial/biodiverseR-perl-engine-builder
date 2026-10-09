@@ -6,6 +6,11 @@ on:
       build_type:
         required: true
         type: string
+    outputs:
+      windows_filename:
+        value: ${{ jobs.perl.outputs.windows_filename }}
+      windows_sha256:
+        value: ${{ jobs.perl.outputs.windows_sha256 }}
 
 env:
   PERL5LIB: /Users/runner/perl5/lib/perl5
@@ -20,12 +25,15 @@ env:
 
 jobs:
   perl:
+    outputs:
+      windows_filename: ${{ steps.metadata.outputs.filename }}
+      windows_sha256: ${{ steps.metadata.outputs.sha256 }}
 
     runs-on: windows-latest
     
     permissions:
       id-token: write
-      contents: read
+      contents: write
       attestations: write
 
     steps:
@@ -232,12 +240,27 @@ jobs:
             -RedirectStandardError runtime.err.log `
             -PassThru
 
-          Start-Sleep -Seconds 10
+          $success = $false
 
-          Get-Content runtime.out.log -ErrorAction SilentlyContinue
-          Get-Content runtime.err.log -ErrorAction SilentlyContinue
+          for ($i = 0; $i -lt 30; $i++) {
 
-          curl.exe --fail "$runtime_url/api_key"
+            try {
+              Invoke-WebRequest `
+                -Uri "$runtime_url/api_key" `
+                -UseBasicParsing `
+                -ErrorAction Stop | Out-Null
+
+              $success = $true
+              break
+            }
+            catch {
+              Start-Sleep -Seconds 1
+            }
+          }
+
+          if (-not $success) {
+            throw "Runtime did not start listening within 30 seconds."
+          }
 
           Get-Process BiodiverseR -ErrorAction SilentlyContinue |
             Stop-Process -Force
@@ -311,6 +334,16 @@ jobs:
             -Path BiodiverseR.exe `
             -DestinationPath BiodiverseR_win_x64_${env:VERSION}.zip
 
+      - name: Generate release metadata
+        if: inputs.build_type == 'release'
+        id: metadata
+        shell: bash
+        run: |
+          SHA=$(sha256sum BiodiverseR_win_x64_${VERSION}.zip | cut -d' ' -f1)
+
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+          echo "filename=BiodiverseR_win_x64_${VERSION}.zip" >> "$GITHUB_OUTPUT"
+
       - name: Upload release artifact
         if: inputs.build_type == 'release'
         uses: actions/upload-artifact@v7
@@ -323,7 +356,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: |
-            BiodiverseR_win_x64_${{ env.VERSION }}.zip
+           BiodiverseR_win_x64_${{ env.VERSION }}.zip
 
       - name: Upload CI artifact
         if: ${{ inputs.build_type != 'release' }}
