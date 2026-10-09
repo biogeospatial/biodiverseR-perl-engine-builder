@@ -41,6 +41,4 @@ jobs:
 
           WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
 
-          echo "$VERSION"
-          echo "$WINDOWS_URL"
-          echo "$WINDOWS_SHA256"
+          python scripts/update_releases_json.py "$VERSION" "$WINDOWS_URL" "$WINDOWS_SHA256" "" "" "" ""
