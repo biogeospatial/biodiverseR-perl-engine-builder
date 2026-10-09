@@ -244,8 +244,6 @@ jobs:
 
           for ($i = 0; $i -lt 30; $i++) {
 
-            Write-Host "Retry $i"
-
             try {
               Invoke-WebRequest `
                 -Uri "$runtime_url/api_key" `
@@ -354,7 +352,7 @@ jobs:
           path: BiodiverseR_win_x64_${{ env.VERSION }}.zip
 
       - name: Upload release asset
-        if: false
+        if: inputs.build_type == 'release'
         uses: softprops/action-gh-release@v3
         with:
           files: |
