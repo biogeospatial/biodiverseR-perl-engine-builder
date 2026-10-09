@@ -39,7 +39,15 @@ jobs:
           WINDOWS_FILENAME="${{ needs.build-windows.outputs.windows_filename }}"
           WINDOWS_SHA256="${{ needs.build-windows.outputs.windows_sha256 }}"
 
+          MACOS_FILENAME="${{ needs.build-macos.outputs.macos_filename }}"
+          MACOS_SHA256="${{ needs.build-macos.outputs.macos_sha256 }}"
+
           WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
+
+          MACOS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$MACOS_FILENAME"
+
+          echo "$MACOS_FILENAME"
+          echo "$MACOS_SHA256"
 
           python scripts/update_releases_json.py "$VERSION" "$WINDOWS_URL" "$WINDOWS_SHA256" "" "" "" ""
 
