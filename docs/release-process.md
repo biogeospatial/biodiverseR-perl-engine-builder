@@ -30,10 +30,13 @@ git push origin v0.2.0
 The release workflow:
 
 1. Builds the runtime package.
-2. Creates a runtime archive.
-3. Creates or updates the GitHub Release.
-4. Uploads the runtime archive as a release asset.
-
+2. Runs runtime validation tests.
+3. Creates a runtime archive.
+4. Generates release metadata and checksums.
+5. Creates or updates the GitHub Release.
+6. Uploads the runtime archive as a release asset.
+7. Updates `releases.json`.
+8. Commits and publishes runtime metadata updates.
 ## Release Workflow
 
 ### 1. Ensure CI Is Passing
@@ -75,11 +78,25 @@ Example:
 BiodiverseR_macos_arm64_v0.2.0.zip
 ```
 
-### 5. Update releases.json
+### 5. Verify Automatic Metadata Updates
 
-Update the release manifest to reference the new runtime release.
+The release workflow automatically:
+
+- Generates release metadata.
+- Generates SHA256 checksums.
+- Updates `releases.json`.
+- Commits metadata updates back to the repository.
+
+Verify that the workflow successfully updated `releases.json` and created a metadata commit.
 
 Example:
+
+```text
+github-actions[bot]
+Add runtime release to releases.json
+```
+
+Example generated metadata:
 
 ```json
 {
@@ -244,20 +261,46 @@ BiodiverseR_macos_arm64_v0.2.0.zip
 Release assets are intended for distribution and installation by
 BiodiverseR users.
 
-## Future Automation
+## Release Publication and Promotion
+
+Publishing a runtime release and promoting a runtime release are separate actions.
+
+Publishing a release:
+
+```text
+Create release
+    ↓
+Add release metadata to releases.json
+```
+
+Promotion:
+
+```text
+Update current in releases.json
+```
+
+New releases are added automatically to `releases.json` but do not automatically become the current default runtime.
+
+This allows release validation before promotion and supports runtime version testing using environment variable overrides.
+
+## Release Automation
 
 The release workflow currently:
 
 1. Builds runtime packages.
-2. Creates GitHub Releases.
-3. Uploads release assets.
+2. Runs runtime validation tests.
+3. Creates GitHub Releases.
+4. Uploads release assets.
+5. Generates SHA256 checksums.
+6. Updates `releases.json`.
+7. Commits metadata updates automatically.
 
-Planned future enhancements include:
+Future enhancements include:
 
-1. Automatic SHA-256 generation.
-2. Automatic updates to `releases.json`.
-3. Expanded multi-platform release automation.
-4. Additional runtime validation and release checks.
+1. Expanded multi-platform release metadata generation.
+2. Additional runtime validation and release checks.
+3. Runtime dependency release integration.
+4. Automated release promotion workflows.
 
 ## Current Status
 
@@ -266,5 +309,5 @@ Planned future enhancements include:
 - macOS x86_64 runtime build: planned
 - Linux runtime build: in progress
 - Automated macOS release workflow: complete
-- Automated `releases.json` updates: planned
+- Automated `releases.json` updates: complete
 
