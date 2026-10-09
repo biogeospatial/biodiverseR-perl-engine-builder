@@ -55,5 +55,5 @@ jobs:
             echo "No changes"
           else
             git commit -m "Add runtime release $VERSION to releases.json"
-            git push
+            git push origin HEAD:automatic-releases-json
           fi
