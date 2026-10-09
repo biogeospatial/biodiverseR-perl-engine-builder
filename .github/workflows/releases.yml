@@ -30,4 +30,10 @@ jobs:
 
     steps:
       - run: |
-          echo "${{ needs.build-windows.outputs.windows_filename }}"
+          VERSION="${{ github.ref_name }}"
+          WINDOWS_FILENAME="${{ needs.build-windows.outputs.windows_filename }}"
+          WINDOWS_SHA256="${{ needs.build-windows.outputs.windows_sha256 }}"
+
+          echo "$VERSION"
+          echo "$WINDOWS_FILENAME"
+          echo "$WINDOWS_SHA256"
