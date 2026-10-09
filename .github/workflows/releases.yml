@@ -42,3 +42,18 @@ jobs:
           WINDOWS_URL="https://github.com/biogeospatial/biodiverseR-perl-engine-builder/releases/download/$VERSION/$WINDOWS_FILENAME"
 
           python scripts/update_releases_json.py "$VERSION" "$WINDOWS_URL" "$WINDOWS_SHA256" "" "" "" ""
+
+
+      - name: Commit releases.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add releases.json
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Add runtime release $VERSION to releases.json"
+            git push
+          fi
