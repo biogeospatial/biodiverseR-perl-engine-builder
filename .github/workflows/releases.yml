@@ -34,12 +34,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set release version
-        run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_ENV"
-
       - name: Update releases.json
         env:
+          VERSION: ${{ github.ref_name }}
           WINDOWS_FILENAME: ${{ needs.build-windows.outputs.windows_filename }}
           WINDOWS_SHA256: ${{ needs.build-windows.outputs.windows_sha256 }}
         run: |
