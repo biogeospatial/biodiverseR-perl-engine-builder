@@ -64,6 +64,12 @@ the same machine.
 The repository root contains a JSON manifest describing available
 runtime releases.
 
+The release workflow maintains this file automatically when new runtime
+releases are published.
+
+New releases are added automatically to the manifest, but do not
+automatically become the default runtime version.
+
 File:
 
 ```text
@@ -99,6 +105,11 @@ Example:
 #### `current`
 
 The runtime version BiodiverseR should use by default.
+
+Publishing a runtime release and promoting a runtime release are separate
+actions. New releases are added to the manifest automatically, while the
+`current` value is updated independently once a release has been
+validated.
 
 Example:
 
@@ -289,8 +300,11 @@ The automated release workflow:
 1. Builds the runtime.
 2. Runs validation tests.
 3. Packages the runtime archive.
-4. Creates or updates the GitHub Release.
-5. Uploads runtime release assets.
+4. Generates release metadata and SHA256 checksums.
+5. Creates or updates the GitHub Release.
+6. Uploads runtime release assets.
+7. Updates `releases.json`.
+8. Commits and publishes metadata updates.
 
 See:
 
@@ -313,6 +327,16 @@ BiodiverseR uses the release manifest as the authoritative source for:
 
 Runtime installation and management are normally performed
 automatically by BiodiverseR and require no user intervention.
+
+## Current Status
+
+- Windows runtime build: complete
+- macOS ARM64 runtime build: complete
+- Linux runtime build: in progress
+- Automated runtime release workflow: complete
+- Automated GitHub Release publication: complete
+- Automated SHA256 generation: complete
+- Automated `releases.json` updates: complete
 
 ## License
 
