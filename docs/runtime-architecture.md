@@ -23,7 +23,7 @@ The runtime ecosystem currently consists of four primary repositories:
 ```text
 Biodiverse
 BiodiverseR
-biodiverse-sp-portable
+biodiverse-runtime-dependencies
 biodiverseR-perl-engine-builder
 ```
 
@@ -35,32 +35,33 @@ Provides the underlying biodiversity analysis functionality.
 
 Provides the R interface used by end users.
 
-### biodiverse-sp-portable
+### biodiverse-runtime-dependencies
 
-Provides pre-built Strawberry Perl runtime distributions used by the
-Windows runtime build process.
+Builds and publishes pre-built Perl runtime dependency archives for
+Windows, macOS and Linux. Its `releases.json` manifest maps release
+channels to platform-specific download URLs and SHA-256 checksums.
 
 ### biodiverseR-perl-engine-builder
 
-Builds, tests, packages and publishes runtime releases used by
-BiodiverseR.
+Downloads and verifies the selected platform archive, then builds, tests,
+packages and publishes the BiodiverseR runtime.
 
 ## Runtime Lifecycle
 
 The high-level runtime lifecycle is:
 
 ```text
-Git Tag
+Runtime dependency release
     ↓
-Release Workflow
+Upstream releases.json
     ↓
-Build Runtime
+Select channel and platform
     ↓
-Package Runtime
+Download and verify Perl runtime
     ↓
-GitHub Release
+Build and package BiodiverseR runtime
     ↓
-releases.json
+Builder GitHub Release and releases.json
     ↓
 BiodiverseR
     ↓
@@ -98,6 +99,9 @@ releases.json
 
 BiodiverseR uses this manifest to locate the correct runtime for the
 current platform.
+
+The builder's Perl runtime inputs are selected separately from the
+upstream `biodiverse-runtime-dependencies` `releases.json` manifest.
 
 ## Runtime Selection
 

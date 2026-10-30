@@ -30,34 +30,31 @@ BiodiverseR Runtime
  System libraries
 ```
 
+## Runtime Dependency Releases
+
+Runtime build workflows resolve their Perl distribution and dependencies
+from the upstream `biodiverse-runtime-dependencies` repository's
+`releases.json`. The selected channel points to a release, whose
+platform-specific URL and SHA-256 checksum identify the archive.
+
+The default channel is `development`, which is currently the only
+populated channel. The Windows, macOS and Linux manual CI workflows allow
+selecting `development`, `testing` or `stable`; a channel without a
+published release or platform artifact fails with a clear error.
+
+Downloaded archives are checksum-verified before extraction. On Windows,
+the Strawberry Perl distribution is loaded from the archive's `perl`
+directory. If an archive includes Carton-managed libraries under
+`local/lib/perl5`, the platform workflow adds both that directory and its
+architecture-specific subdirectory to `PERL5LIB`.
+
+The upstream metadata is available at:
+
+```text
+https://raw.githubusercontent.com/biogeospatial/biodiverse-runtime-dependencies/main/releases.json
+```
+
 ## Windows
-
-### Perl
-
-```text
-Strawberry Perl 5.38.4.1
-```
-
-Windows runtime builds currently use the same Perl version as the
-Biodiverse GUI dependency stack.
-
-See:
-
-```text
-ADR-0002: Platform-Specific Perl Versions
-```
-
-### Runtime Source
-
-The Windows workflow downloads a pre-built portable runtime from:
-
-```text
-biodiverse-sp-portable
-```
-
-This portable runtime contains the majority of the required dependency
-stack and avoids rebuilding large geospatial dependencies on every CI
-run.
 
 ### Major Components
 
@@ -73,17 +70,8 @@ Biodiverse dependencies
 
 ## macOS
 
-### Perl
-
-```text
-Perl 5.38.4
-```
-
-Installed using:
-
-```text
-perlbrew
-```
+The macOS workflow extracts the selected prebuilt Perl distribution and
+its bundled dependencies instead of building Perl with perlbrew.
 
 ### System Dependencies
 
@@ -109,50 +97,10 @@ PROJ
 GEOS
 ```
 
-### Build Environment
-
-The macOS build relies on:
-
-```text
-PKG_CONFIG_PATH
-CMAKE_PREFIX_PATH
-CPPFLAGS
-CFLAGS
-CXXFLAGS
-```
-
-to ensure GDAL and related dependencies can locate Homebrew headers and
-libraries.
-
-### Known Issues
-
-Historically, the following have caused build failures:
-
-```text
-Alien::gdal
-Geo::GDAL::FFI
-OpenEXR
-Imath
-```
-
-Particularly:
-
-```text
-Imath/half.h not found
-```
-
-which was resolved by explicitly providing Homebrew include paths during
-the build.
-
 ## Linux
 
-### Perl
-
-```text
-Perl 5.38.4
-```
-
-(Current target version.)
+The Linux validation workflow downloads and uses the selected prebuilt
+Perl distribution and verifies the bundled PDL modules.
 
 ### Status
 
@@ -202,8 +150,9 @@ GEOS
 
 ### Build Characteristics
 
-This dependency stack is one of the longest-running parts of the macOS
-build process and can dominate overall workflow execution time.
+The stack is bundled in the upstream platform archives instead of being
+rebuilt during every runtime packaging workflow. Its dependency baseline
+is maintained in `biodiverse-runtime-dependencies`.
 
 ## PAR::Packer
 
@@ -242,7 +191,8 @@ capabilities required by Biodiverse.
 PDL::GSL::CDF
 ```
 
-is currently installed as part of the runtime build process.
+is included in the prebuilt runtime dependency archive selected by the
+release channel.
 
 ## Runtime Build Dependencies
 
@@ -260,11 +210,11 @@ BiodiverseR
 ### Build Sequence
 
 ```text
-Install Perl
+Resolve runtime dependency channel
         ↓
-Install PDL
+Download and verify platform archive
         ↓
-Install Geo::GDAL::FFI
+Extract prebuilt Perl and dependencies
         ↓
 Install Biodiverse dependencies
         ↓
@@ -277,24 +227,8 @@ Run BiodiverseR tests
 Build runtime executable
 ```
 
-## Platform-Specific Versions
-
-Platform-specific versions are permitted where required for build
-stability or compatibility.
-
-The current configuration is defined in:
-
-```text
-.github/runtime-config.yml
-```
-
-See:
-
-```text
-ADR-0002: Platform-Specific Perl Versions
-```
-
-for the rationale.
+Perl versions and dependency archive URLs are defined by the selected
+release channel in the upstream release manifest.
 
 ## Related Documents
 
@@ -304,4 +238,3 @@ docs/release-process.md
 docs/troubleshooting.md
 docs/adr/
 ```
-

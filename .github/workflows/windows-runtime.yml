@@ -6,6 +6,10 @@ on:
       build_type:
         required: true
         type: string
+      runtime_channel:
+        required: false
+        default: development
+        type: string
     outputs:
       windows_filename:
         value: ${{ jobs.perl.outputs.windows_filename }}
@@ -19,8 +23,6 @@ env:
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_CPANM_HOME: /Users/runner/_cpanm
-  ST: C:\Strawberry538
-  SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
   CMAKE_BUILD_PARALLEL_LEVEL: 4
 
 jobs:
@@ -39,6 +41,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
       - name: Install workflow tools
         shell: pwsh
         run: |
@@ -53,24 +60,61 @@ jobs:
 
           "BD_NO_ALIEN_GTKSTACK=$(yq -r '.globals.build.no_alien_gtkstack' .github/runtime-config.yml)" >> $env:GITHUB_ENV
 
-          "SP_URL=$(yq -r '.platforms.windows.strawberry_perl.url' .github/runtime-config.yml)" >> $env:GITHUB_ENV
-
           "RUNTIME_TEST_PORT=$(yq -r '.globals.runtime.test_port' .github/runtime-config.yml)" >> $env:GITHUB_ENV
 
-      - name: Install Strawberry perl
+      - name: Resolve runtime dependency release
+        shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "$env:SP_URL" -OutFile ".\sp.zip"
-          Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
-          ls "$env:ST"
-          "PATH=$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin;$env:PATH" >> $env:GITHUB_ENV
+          python scripts/resolve_runtime_dependency.py `
+            --channel "${{ inputs.runtime_channel }}" `
+            --platform windows `
+            --github-env "$env:GITHUB_ENV"
+
+      - name: Download runtime dependencies
+        shell: pwsh
+        run: |
+          $archive = "$env:RUNNER_TEMP\runtime-dependencies.zip"
+          Invoke-WebRequest -Uri $env:RUNTIME_DEPENDENCY_URL -OutFile $archive
+
+          $actualSha256 = (Get-FileHash -Path $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualSha256 -ne $env:RUNTIME_DEPENDENCY_SHA256) {
+            throw "Runtime dependency checksum mismatch for $env:RUNTIME_DEPENDENCY_VERSION."
+          }
+
+          $runtimeRoot = "$env:RUNNER_TEMP\runtime-dependencies"
+          Expand-Archive -Path $archive -DestinationPath $runtimeRoot
+          $env:ST = "$runtimeRoot\perl"
+          if (-not (Test-Path "$env:ST\perl\bin\perl.exe")) {
+            throw "The runtime dependency archive does not contain the expected Windows Perl runtime."
+          }
+
+          "ST=$env:ST" >> $env:GITHUB_ENV
+          "$env:ST\perl\bin" >> $env:GITHUB_PATH
+          "$env:ST\perl\site\bin" >> $env:GITHUB_PATH
+          "$env:ST\c\bin" >> $env:GITHUB_PATH
+          "$env:ST\c\x86_64-w64-mingw32\bin" >> $env:GITHUB_PATH
+
+          $localLib = "$runtimeRoot\local\lib\perl5"
+          if (Test-Path $localLib) {
+            $archName = & "$env:ST\perl\bin\perl.exe" -MConfig -e 'print $Config{archname}'
+            $localLibs = @($localLib)
+            $archLib = Join-Path $localLib $archName
+            if (Test-Path $archLib) {
+              $localLibs += $archLib
+            }
+            if ($env:PERL5LIB) {
+              $localLibs += $env:PERL5LIB -split ';'
+            }
+            "PERL5LIB=$($localLibs -join ';')" >> $env:GITHUB_ENV
+          }
 
       - name: perl -V
         shell: cmd
         run: |
-          :: set PATH=%SP_PATHS%;%PATH%
           path
           perl -V
           pwd
+          perl -MPDL -MPDL::GSL::CDF -MGeo::GDAL::FFI -e "1"
 
         #  These dirs must exist before caching 
         #  is first called or it will not work.
@@ -132,8 +176,6 @@ jobs:
           # cpanm --notest Geo::ShapeFile
           cpanm --notest autovivification
           cpanm --notest Spreadsheet::Read
-          cpanm --installdeps --notest Geo::GDAL::FFI
-          cpanm Geo::GDAL::FFI
 
       - name: PAR::Packer with Biodiverse icon
         shell: pwsh

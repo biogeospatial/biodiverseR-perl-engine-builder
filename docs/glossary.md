@@ -203,6 +203,10 @@ Build configuration stored in:
 The configuration file contains shared and platform-specific settings
 used by runtime build workflows.
 
+Perl versions and runtime dependency download URLs are resolved from the
+selected channel in the upstream `biodiverse-runtime-dependencies`
+`releases.json` manifest.
+
 ---
 
 ## Runtime Installation Test
@@ -259,7 +263,8 @@ value stored in the release manifest before installation.
 A Windows Perl distribution used by the Biodiverse Windows runtime build
 process.
 
-Current Windows runtime builds use Strawberry Perl 5.38.4.1.
+The Windows builder obtains it as part of the platform archive selected
+from the upstream runtime dependency manifest.
 
 ---
 
@@ -303,4 +308,3 @@ The runtime build workflows use `yq` to load configuration values from:
 ```text
 .github/runtime-config.yml
 ```
-

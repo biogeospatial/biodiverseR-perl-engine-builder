@@ -14,18 +14,7 @@ globals:
     no_alien_gtkstack: true
 
 platforms:
-  windows:
-    strawberry_perl:
-      url: "https://github.com/biogeospatial/biodiverse-sp-portable/releases/download/5.42.2.1-20260513/bd-sp-perl-5.38.4.1-64bit-PDL-20260513.zip"
-
   macos:
-    perl:
-      version: "5.38.4"
-
     pkg_config_path: "/opt/homebrew/lib/pkgconfig"
 
     path: "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-
-  linux:
-    perl:
-      version: "5.38.4"

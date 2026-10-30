@@ -2,6 +2,16 @@ name: Windows CI
 
 on:
   workflow_dispatch:
+    inputs:
+      runtime_channel:
+        description: Runtime dependency release channel
+        required: true
+        default: development
+        type: choice
+        options:
+          - development
+          - testing
+          - stable
   pull_request:
 
 jobs:
@@ -9,3 +19,4 @@ jobs:
     uses: ./.github/workflows/windows-runtime.yml
     with:
       build_type: ci
+      runtime_channel: ${{ inputs.runtime_channel || 'development' }}

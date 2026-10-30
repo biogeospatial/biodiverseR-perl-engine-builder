@@ -2,6 +2,16 @@ name: Linux Test
 
 on:
   workflow_dispatch:
+    inputs:
+      runtime_channel:
+        description: Runtime dependency release channel
+        required: true
+        default: development
+        type: choice
+        options:
+          - development
+          - testing
+          - stable
   pull_request:
 
 jobs:
@@ -13,6 +23,11 @@ jobs:
     steps:
 
       - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
 
       - name: Install system dependencies
         run: |
@@ -28,15 +43,50 @@ jobs:
             sqlite3 \
             libsqlite3-dev
 
-      - name: Install perlbrew
+      - name: Resolve runtime dependency release
         run: |
-          curl -L https://install.perlbrew.pl | bash
+          python scripts/resolve_runtime_dependency.py \
+            --channel "${{ inputs.runtime_channel || 'development' }}" \
+            --platform linux \
+            --github-env "$GITHUB_ENV"
 
-      - name: Build Perl 5.38.4
+      - name: Download runtime dependencies
         run: |
-          source ~/perl5/perlbrew/etc/bashrc
+          archive="$RUNNER_TEMP/runtime-dependencies.zip"
+          runtime_root="$RUNNER_TEMP/runtime-dependencies"
 
-          perlbrew install perl-5.38.4
-          perlbrew use perl-5.38.4
+          curl --fail --location --retry 3 \
+            "$RUNTIME_DEPENDENCY_URL" \
+            --output "$archive"
 
+          echo "$RUNTIME_DEPENDENCY_SHA256  $archive" | sha256sum --check
+          mkdir -p "$runtime_root"
+          unzip -q "$archive" -d "$runtime_root"
+
+          perl_root=$(find "$runtime_root/perl" -mindepth 1 -maxdepth 1 \
+            -type d -name 'perl-*' -print -quit)
+          if [[ -z "$perl_root" || ! -x "$perl_root/bin/perl" ]]; then
+            echo "The runtime dependency archive does not contain the expected Linux Perl runtime." >&2
+            exit 1
+          fi
+
+          echo "PERL_ROOT=$perl_root" >> "$GITHUB_ENV"
+          echo "$perl_root/bin" >> "$GITHUB_PATH"
+
+          local_lib="$runtime_root/local/lib/perl5"
+          if [[ -d "$local_lib" ]]; then
+            arch_lib="$local_lib/$("$perl_root/bin/perl" -MConfig -e 'print $Config{archname}')"
+            perl5lib="$local_lib"
+            if [[ -d "$arch_lib" ]]; then
+              perl5lib="$perl5lib:$arch_lib"
+            fi
+            if [[ -n "${PERL5LIB:-}" ]]; then
+              perl5lib="$perl5lib:$PERL5LIB"
+            fi
+            echo "PERL5LIB=$perl5lib" >> "$GITHUB_ENV"
+          fi
+
+      - name: Validate bundled Perl dependencies
+        run: |
           perl -V
+          perl -MPDL -MPDL::GSL::CDF -e 1

@@ -281,32 +281,29 @@ for inspection.
 
 ## GitHub Actions
 
-### Perl cache not restored
+### Runtime dependency download failed
 
 #### Symptoms
 
 ```text
-Cache not found for input keys:
-perlbrew--macOS
+The 'stable' channel does not reference a release.
 ```
 
 #### Checks
 
-Verify cache configuration:
-
-```yaml
-key: perlbrew-${{ env.PERL_VERSION }}-${{ runner.os }}
-```
-
-Verify cache save step reports:
+Check the selected channel in:
 
 ```text
-Cache saved with key:
+https://raw.githubusercontent.com/biogeospatial/biodiverse-runtime-dependencies/main/releases.json
 ```
 
-#### Notes
+The selected channel must point to a release containing metadata for the
+current platform. The manual CI workflows default to `development` and
+allow selecting `testing` or `stable`.
 
-Cache misses do not affect correctness but increase build duration.
+Downloaded archives are checked against the manifest SHA-256 before
+extraction. A checksum mismatch or missing Perl executable fails the
+workflow rather than continuing with a partial installation.
 
 ---
 
@@ -404,4 +401,3 @@ git tag
 git tag v0.2.0-test
 git push origin v0.2.0-test
 ```
-

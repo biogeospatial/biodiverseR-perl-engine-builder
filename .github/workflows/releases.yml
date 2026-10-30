@@ -11,11 +11,13 @@ jobs:
     uses: ./.github/workflows/windows-runtime.yml
     with:
       build_type: release
+      runtime_channel: development
 
   build-macos:
     uses: ./.github/workflows/macos-runtime.yml
     with:
       build_type: release
+      runtime_channel: development
 
   build-linux:
     runs-on: ubuntu-latest
