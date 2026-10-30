@@ -93,6 +93,8 @@ jobs:
             perl -MCPAN -e 'install App::cpanminus'
           fi
 
+          echo "$HOME/perl5/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/perl5/bin:$PATH"
           cpanm --version
 
       - name: Validate bundled Perl dependencies
