@@ -71,17 +71,10 @@ Biodiverse dependencies
 ## macOS
 
 The macOS workflow extracts the selected prebuilt Perl distribution and
-its bundled dependencies instead of building Perl with perlbrew.
-
-### System Dependencies
-
-Installed using:
-
-```bash
-brew install gsl
-brew install sqlite
-brew install gdal
-```
+its bundled dependencies instead of building Perl with perlbrew or
+installing the application dependency stacks again. It validates the
+bundled modules and runs the Biodiverse and BiodiverseR test suites
+against them.
 
 ### Major Components
 
@@ -216,15 +209,11 @@ Download and verify platform archive
         ↓
 Extract prebuilt Perl and dependencies
         ↓
-Install Biodiverse dependencies
-        ↓
 Run Biodiverse tests
-        ↓
-Install BiodiverseR dependencies
         ↓
 Run BiodiverseR tests
         ↓
-Build runtime executable
+Install packaging-only tools and build runtime executable
 ```
 
 Perl versions and dependency archive URLs are defined by the selected
