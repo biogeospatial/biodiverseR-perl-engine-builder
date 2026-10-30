@@ -87,10 +87,17 @@ jobs:
             --runtime-root "$runtime_root" \
             --github-env "$GITHUB_ENV"
 
+      - name: Install cpanminus for packaging tools
+        run: |
+          if ! command -v cpanm >/dev/null 2>&1; then
+            perl -MCPAN -e 'install App::cpanminus'
+          fi
+
+          cpanm --version
+
       - name: Validate bundled Perl dependencies
         run: |
           perl -V
-          cpanm --version
           perl -MPDL -MPDL::GSL::CDF -MGeo::GDAL::FFI -e 1
 
       - name: Clone Biodiverse

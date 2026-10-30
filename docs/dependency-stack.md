@@ -74,7 +74,8 @@ The macOS workflow extracts the selected prebuilt Perl distribution and
 its bundled dependencies instead of building Perl with perlbrew or
 installing the application dependency stacks again. It validates the
 bundled modules and runs the Biodiverse and BiodiverseR test suites
-against them.
+against them. It installs cpanminus only when absent, for packaging-only
+tools such as PAR::Packer.
 
 ### Major Components
 
