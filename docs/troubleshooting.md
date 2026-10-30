@@ -305,6 +305,28 @@ Downloaded archives are checked against the manifest SHA-256 before
 extraction. A checksum mismatch or missing Perl executable fails the
 workflow rather than continuing with a partial installation.
 
+### Perl cannot find Config.pm after extraction
+
+#### Symptoms
+
+```text
+Can't locate Config.pm in @INC
+```
+
+#### Cause
+
+Perl distributions built with perlbrew may retain library paths pointing
+to the original build runner. Extracting the archive elsewhere does not
+update those paths automatically.
+
+#### Resolution
+
+The platform workflows configure `PERL5LIB` from the extracted Perl
+archive's versioned and architecture-specific library directories before
+running Perl. They also add any bundled Carton libraries. If this error
+persists, verify the selected archive contains `Config.pm` and its
+matching `Config_heavy.pl`.
+
 ---
 
 ### Release asset not attached to GitHub Release

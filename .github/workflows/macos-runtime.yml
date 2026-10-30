@@ -62,6 +62,8 @@ jobs:
           archive="$RUNNER_TEMP/runtime-dependencies.zip"
           runtime_root="$RUNNER_TEMP/runtime-dependencies"
 
+          echo "Using runtime dependency release $RUNTIME_DEPENDENCY_VERSION ($RUNTIME_DEPENDENCY_CHANNEL)"
+
           curl --fail --location --retry 3 \
             "$RUNTIME_DEPENDENCY_URL" \
             --output "$archive"
@@ -80,18 +82,10 @@ jobs:
           echo "PERL_ROOT=$perl_root" >> "$GITHUB_ENV"
           echo "$perl_root/bin" >> "$GITHUB_PATH"
 
-          local_lib="$runtime_root/local/lib/perl5"
-          if [[ -d "$local_lib" ]]; then
-            arch_lib="$local_lib/$("$perl_root/bin/perl" -MConfig -e 'print $Config{archname}')"
-            perl5lib="$local_lib"
-            if [[ -d "$arch_lib" ]]; then
-              perl5lib="$perl5lib:$arch_lib"
-            fi
-            if [[ -n "${PERL5LIB:-}" ]]; then
-              perl5lib="$perl5lib:$PERL5LIB"
-            fi
-            echo "PERL5LIB=$perl5lib" >> "$GITHUB_ENV"
-          fi
+          python scripts/configure_perl_runtime.py \
+            --perl-root "$perl_root" \
+            --runtime-root "$runtime_root" \
+            --github-env "$GITHUB_ENV"
 
       - name: Validate bundled Perl dependencies
         run: |

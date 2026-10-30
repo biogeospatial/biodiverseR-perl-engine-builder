@@ -94,19 +94,10 @@ jobs:
           "$env:ST\c\bin" >> $env:GITHUB_PATH
           "$env:ST\c\x86_64-w64-mingw32\bin" >> $env:GITHUB_PATH
 
-          $localLib = "$runtimeRoot\local\lib\perl5"
-          if (Test-Path $localLib) {
-            $archName = & "$env:ST\perl\bin\perl.exe" -MConfig -e 'print $Config{archname}'
-            $localLibs = @($localLib)
-            $archLib = Join-Path $localLib $archName
-            if (Test-Path $archLib) {
-              $localLibs += $archLib
-            }
-            if ($env:PERL5LIB) {
-              $localLibs += $env:PERL5LIB -split ';'
-            }
-            "PERL5LIB=$($localLibs -join ';')" >> $env:GITHUB_ENV
-          }
+          python scripts/configure_perl_runtime.py `
+            --perl-root "$env:ST\perl" `
+            --runtime-root $runtimeRoot `
+            --github-env "$env:GITHUB_ENV"
 
       - name: perl -V
         shell: cmd
