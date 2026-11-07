@@ -9,6 +9,7 @@ globals:
 
   runtime:
     test_port: 3001
+    channel: stable
 
   build:
     no_alien_gtkstack: true
